@@ -1,9 +1,8 @@
-package org.panteleyev.jpackage;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.jpackage;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -33,52 +32,36 @@ public class JPackageMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
-
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
-
     @Parameter
     private ImageType type;
-
     @Parameter(required = true)
     private String name;
-
-    @Parameter
+    @Parameter(required = true)
     private String appVersion;
-
-    @Parameter(defaultValue = "")
+    @Parameter
     private String vendor;
-
     @Parameter
     private String icon;
-
     @Parameter
     private String runtimeImage;
-
     @Parameter
     private String input;
-
     @Parameter(required = true)
     private String destination;
-
     @Parameter
     private String module;
-
     @Parameter
     private String mainClass;
-
     @Parameter
     private String mainJar;
-
     @Parameter
     private String copyright;
-
     @Parameter
     private String description;
-
     @Parameter
     private String modulePath;
-
     @Parameter
     private String[] javaOptions;
 
@@ -95,6 +78,20 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winShortcut;
     @Parameter
     private boolean winPerUserInstall;
+
+    // OS X specific parameters
+    @Parameter
+    private String macPackageIdentifier;
+    @Parameter
+    private String macPackageName;
+    @Parameter
+    private String macPackageSigningPrefix;
+    @Parameter
+    private boolean macSign;
+    @Parameter
+    private String macSigningKeychain;
+    @Parameter
+    private String macSigningKeyUserName;
 
     public void execute() throws MojoExecutionException {
         String jpackage = getJPackageExecutable();
@@ -156,131 +153,72 @@ public class JPackageMojo extends AbstractMojo {
     private void buildParameters(List<String> parameters) {
         getLog().info("=== Parameters:");
 
-        if (type != null) {
-            getLog().info("type = " + type);
-            parameters.add("--type");
-            parameters.add(type.getValue());
-        }
-
-        getLog().info("name = " + name);
-        parameters.add("--name");
-        parameters.add(name);
-
-        getLog().info("appVersion = " + appVersion);
-        parameters.add("--app-version");
-        parameters.add(appVersion);
-
-        getLog().info("destination = " + destination);
-        parameters.add("--dest");
-        parameters.add(destination);
-
-        if (copyright != null) {
-            getLog().info("copyright = " + copyright);
-            parameters.add("--copyright");
-            parameters.add(copyright);
-        }
-
-        if (description != null) {
-            getLog().info("description = " + description);
-            parameters.add("--description");
-            parameters.add(description);
-        }
-
-        if (runtimeImage != null) {
-            getLog().info("runtimeImage = " + runtimeImage);
-            parameters.add("--runtime-image");
-            parameters.add(runtimeImage);
-        }
-
-        if (input != null) {
-            getLog().info("input = " + input);
-            parameters.add("--input");
-            parameters.add(input);
-        }
-
-        if (vendor != null) {
-            getLog().info("vendor = " + vendor);
-            parameters.add("--vendor");
-            parameters.add(vendor);
-        }
-
-        if (module != null) {
-            getLog().info("module = " + module);
-            parameters.add("--module");
-            parameters.add(module);
-        }
-
-        if (mainClass != null) {
-            getLog().info("mainClass = " + mainClass);
-            parameters.add("--main-class");
-            parameters.add(mainClass);
-        }
-
-        if (mainJar != null) {
-            getLog().info("mainJar = " + mainJar);
-            parameters.add("--main-jar");
-            parameters.add(mainJar);
-        }
-
-        if (modulePath != null) {
-            getLog().info("modulePath = " + modulePath);
-            parameters.add("--module-path");
-            parameters.add(modulePath);
-        }
-
-        if (icon != null) {
-            getLog().info("icon = " + icon);
-            parameters.add("--icon");
-            parameters.add(icon);
-        }
+        addParameter(parameters, "--type", type);
+        addParameter(parameters, "--name", name);
+        addParameter(parameters, "--app-version", appVersion);
+        addParameter(parameters, "--dest", destination);
+        addParameter(parameters, "--copyright", copyright);
+        addParameter(parameters, "--description", description);
+        addParameter(parameters, "--runtime-image", runtimeImage);
+        addParameter(parameters, "--input", input);
+        addParameter(parameters, "--vendor", vendor);
+        addParameter(parameters, "--module", module);
+        addParameter(parameters, "--main-class", mainClass);
+        addParameter(parameters, "--main-jar", mainJar);
+        addParameter(parameters, "--module-path", modulePath);
+        addParameter(parameters, "--icon", icon);
 
         if (javaOptions != null && javaOptions.length > 0) {
             String options = String.join(" ", javaOptions);
-            getLog().info("javaOptions = " + options);
-            parameters.add("--java-options");
-            parameters.add(options);
+            addParameter(parameters, "--java-options", options);
         }
 
         if (isMac()) {
-
+            addParameter(parameters, "--mac-package-identifier", macPackageIdentifier);
+            addParameter(parameters, "--mac-package-name", macPackageName);
+            addParameter(parameters, "--mac-package-signing-prefix", macPackageSigningPrefix);
+            addParameter(parameters, "--mac-sign", macSign);
+            addParameter(parameters, "--mac-signing-keychain", macSigningKeychain);
+            addParameter(parameters, "--mac-signing-key-user-name", macSigningKeyUserName);
         } else if (isWindows()) {
-            buildWindowsParameters(parameters);
+            addParameter(parameters, "--win-menu", winMenu);
+            addParameter(parameters, "--win-dir-chooser", winDirChooser);
+            addParameter(parameters, "--win-upgrade-uuid", winUpgradeUuid);
+            addParameter(parameters, "--win-menu-group", winMenuGroup);
+            addParameter(parameters, "--win-shortcut", winShortcut);
+            addParameter(parameters, "--win-per-user-install", winPerUserInstall);
         }
 
         getLog().info("===");
     }
 
-    private void buildWindowsParameters(List<String> parameters) {
-        if (winMenu) {
-            getLog().info("winMenu = " + winMenu);
-            parameters.add("--win-menu");
+    private void addParameter(List<String> params, String name, String value) {
+        if (value == null || value.isEmpty()) {
+            return;
         }
 
-        if (winDirChooser) {
-            getLog().info("winDirChooser = " + winDirChooser);
-            parameters.add("--win-dir-chooser");
+        getLog().info(name + " " + value);
+        params.add(name);
+        params.add(value);
+    }
+
+    private void addParameter(List<String> params, String name, boolean value) {
+        if (!value) {
+            return;
         }
 
-        if (winUpgradeUuid != null) {
-            getLog().info("winUpgradeUuid = " + winUpgradeUuid);
-            parameters.add("--win-upgrade-uuid");
-            parameters.add(winUpgradeUuid);
+        getLog().info(name);
+        params.add(name);
+    }
+
+    private void addParameter(List<String> params, String name, EnumParameter value) {
+        if (value == null) {
+            return;
         }
 
-        if (winMenuGroup != null) {
-            getLog().info("winMenuGroup = " + winMenuGroup);
-            parameters.add("--win-menu-group");
-            parameters.add(winMenuGroup);
-        }
-
-        if (winShortcut) {
-            getLog().info("winShortcut = " + winShortcut);
-            parameters.add("--win-shortcut");
-        }
-
-        if (winPerUserInstall) {
-            getLog().info("winPerUserInstall = " + winPerUserInstall);
-            parameters.add("--win-per-user-install");
-        }
+        String strValue = value.getValue();
+        getLog().info(name + " " + strValue);
+        params.add(name);
+        params.add(strValue);
     }
 }

@@ -7,25 +7,16 @@ Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available in
 
 ## Usage
 
-```xml
-<plugin>
-    <groupId>org.panteleyev</groupId>
-    <artifactId>jpackage-maven-plugin</artifactId>
-    <version>0.0.1</version>
-</plugin>
-```
-
 This plugin requires ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
 tool = "jpackage". If ```jpackage``` cannot be found for any reason the build fails.
 
-Plugin determines OS name using ```${os.name}``` property. This is used to configure specific parameters.
-
 ## Configuration
 
-There are generic parameters as well as OS-specific parameters for OS X, Windows, Linux.
+There are generic parameters as well as OS-specific parameters for OS X and Windows.
+Plugin determines OS name using ```${os.name}``` property in order to configure OS-specific parameters.
 
 Generic parameters should be placed in the root plugin configuration. OS-specific parameters should be separated via
-executions. Id of the executions are irrelevant however using OS names improve usability.
+executions. Id of the executions are irrelevant however using OS names improves usability.
 
 *Example:*
 
@@ -54,7 +45,7 @@ With above execution configuration the following command lines can be used:
 
 | Parameter | Type | jpackage argument |
 |---|---|---|
-|type|[Enum](#markdown-header-image-type)|--type &lt;type>|
+|type|Enum|--type &lt;type>|
 |name|String|--name &lt;name>|
 |appVersion|String|--app-version &lt;version>|
 |destination|String|--dest &lt;destination path>|
@@ -79,6 +70,17 @@ With above execution configuration the following command lines can be used:
 |winMenuGroup|--win-menu-group &lt;menu group name>|
 |winShortcut|--win-shortcut|
 |winPerUserInstall|--win-per-user-install|
+
+### OS X Specific Parameters
+
+| Parameter | Type | jpackage argument |
+|---|---|---|
+|macPackageIdentifier|String|--mac-package-identifier &lt;ID string>|
+|macPackageName|String|--mac-package-name &lt;name string>|
+|macPackageSigningPrefix|String|--mac-package-signing-prefix &lt;prefix string>|
+|macSign|boolean|--mac-sign|
+|macSigningKeychain|String|--mac-signing-keychain &lt;file path>|
+|macSigningKeyUserName|String|--mac-signing-key-user-name &lt;team name>|
 
 ### Image Type
 
@@ -125,6 +127,7 @@ With above execution configuration the following command lines can be used:
             <id>win</id>
             <configuration>
                 <icon>icons/icon.ico</icon>
+                <winMenu>true</winMenu>
             </configuration>
         </execution>
     </executions>
