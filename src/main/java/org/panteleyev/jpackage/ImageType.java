@@ -9,7 +9,9 @@ public enum ImageType implements EnumParameter {
     DMG("dmg"),
     PKG("pkg"),
     EXE("exe"),
-    MSI("msi");
+    MSI("msi"),
+    RPM("rpm"),
+    DEB("deb");
 
     private final String value;
 

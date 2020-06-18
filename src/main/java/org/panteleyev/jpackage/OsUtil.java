@@ -14,4 +14,8 @@ public interface OsUtil {
     static boolean isMac() {
         return OS.contains("mac");
     }
+
+    static boolean isLinux() {
+        return OS.contains("linux");
+    }
 }

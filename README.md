@@ -43,22 +43,22 @@ With above execution configuration the following command lines can be used:
 
 ### Generic Parameters
 
-| Parameter | Type | jpackage argument |
-|---|---|---|
-|type|Enum|--type &lt;type>|
-|name|String|--name &lt;name>|
-|appVersion|String|--app-version &lt;version>|
-|destination|String|--dest &lt;destination path>|
-|copyright|String|--copyright &lt;copyright string>|
-|description|String|--description &lt;description string>|
-|vendor|String|--vendor &lt;vendor string>|
-|runtimeImage|String|--runtime-image &lt;file path>|
-|input|String|--input &lt;input path>|
-|module|String|--module &lt;module name>[/&lt;main class>]|
-|modulePath|String|--module-path &lt;module path>...|
-|mainClass|String|--main-class &lt;class name>|
-|mainJar|String|--main-jar &lt;main jar file>|
-|icon|String|--icon &lt;icon file path>|
+| Parameter | JPackage Argument |
+|---|---|
+|type|--type &lt;type>|
+|name|--name &lt;name>|
+|appVersion|--app-version &lt;version>|
+|destination|--dest &lt;destination path>|
+|copyright|--copyright &lt;copyright string>|
+|description|--description &lt;description string>|
+|vendor|--vendor &lt;vendor string>|
+|runtimeImage|--runtime-image &lt;file path>|
+|input|--input &lt;input path>|
+|module|--module &lt;module name>[/&lt;main class>]|
+|modulePath|--module-path &lt;module path>...|
+|mainClass|--main-class &lt;class name>|
+|mainJar|--main-jar &lt;main jar file>|
+|icon|--icon &lt;icon file path>|
 
 ### Windows Specific Parameters
 
@@ -73,24 +73,38 @@ With above execution configuration the following command lines can be used:
 
 ### OS X Specific Parameters
 
-| Parameter | Type | jpackage argument |
-|---|---|---|
-|macPackageIdentifier|String|--mac-package-identifier &lt;ID string>|
-|macPackageName|String|--mac-package-name &lt;name string>|
-|macPackageSigningPrefix|String|--mac-package-signing-prefix &lt;prefix string>|
-|macSign|boolean|--mac-sign|
-|macSigningKeychain|String|--mac-signing-keychain &lt;file path>|
-|macSigningKeyUserName|String|--mac-signing-key-user-name &lt;team name>|
+| Parameter | jpackage argument |
+|---|---|
+|macPackageIdentifier|--mac-package-identifier &lt;ID string>|
+|macPackageName|--mac-package-name &lt;name string>|
+|macPackageSigningPrefix|--mac-package-signing-prefix &lt;prefix string>|
+|macSign|--mac-sign|
+|macSigningKeychain|--mac-signing-keychain &lt;file path>|
+|macSigningKeyUserName|--mac-signing-key-user-name &lt;team name>|
+
+### Linux Specific Parameters
+
+| Parameter | jpackage argument |
+|---|---|
+|linuxPackageName|--linux-package-name &lt;package name>|
+|linuxDebMaintainer|--linux-deb-maintainer &lt;email address>|
+|linuxMenuGroup|--linux-menu-group &lt;menu-group-name>|
+|linuxRpmLicenseType|--linux-rpm-license-type &lt;type string>|
+|linuxAppRelease|--linux-app-release &lt;release value>|
+|linuxAppCategory|--linux-app-category &lt;category value>|
+|linuxShortcut|--linux-shortcut|
 
 ### Image Type
 
-| Plugin value | jpackage type |
+|Plugin Value|JPackage Type|
 |---|---|
 |APP_IMAGE|app-image|
 |DMG|dmg|
 |PKG|pkg|
 |EXE|exe|
 |MSI|msi|
+|RPM|rpm|
+|DEB|deb|
 
 ## Samples
 

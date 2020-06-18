@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import static org.panteleyev.jpackage.OsUtil.isLinux;
 import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
 
@@ -92,6 +93,22 @@ public class JPackageMojo extends AbstractMojo {
     private String macSigningKeychain;
     @Parameter
     private String macSigningKeyUserName;
+
+    // Linux specific parameters
+    @Parameter
+    private String linuxPackageName;
+    @Parameter
+    private String linuxDebMaintainer;
+    @Parameter
+    private String linuxMenuGroup;
+    @Parameter
+    private String linuxRpmLicenseType;
+    @Parameter
+    private String linuxAppRelease;
+    @Parameter
+    private String linuxAppCategory;
+    @Parameter
+    private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException {
         String jpackage = getJPackageExecutable();
@@ -187,6 +204,14 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(parameters, "--win-menu-group", winMenuGroup);
             addParameter(parameters, "--win-shortcut", winShortcut);
             addParameter(parameters, "--win-per-user-install", winPerUserInstall);
+        } else if (isLinux()) {
+            addParameter(parameters, "--linux-package-name", linuxPackageName);
+            addParameter(parameters, "--linux-deb-maintainer", linuxDebMaintainer);
+            addParameter(parameters, "--linux-menu-group", linuxMenuGroup);
+            addParameter(parameters, "--linux-rpm-license-type", linuxRpmLicenseType);
+            addParameter(parameters, "--linux-app-release", linuxAppRelease);
+            addParameter(parameters, "--linux-app-category", linuxAppCategory);
+            addParameter(parameters, "--linux-shortcut", linuxShortcut);
         }
 
         getLog().info("===");
@@ -216,9 +241,6 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        String strValue = value.getValue();
-        getLog().info(name + " " + strValue);
-        params.add(name);
-        params.add(strValue);
+        addParameter(params, name, value.getValue());
     }
 }
