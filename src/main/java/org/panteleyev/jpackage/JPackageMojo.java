@@ -49,6 +49,8 @@ public class JPackageMojo extends AbstractMojo {
     private String runtimeImage;
     @Parameter
     private String input;
+    @Parameter
+    private String installDir;
     @Parameter(required = true)
     private String destination;
     @Parameter
@@ -65,6 +67,8 @@ public class JPackageMojo extends AbstractMojo {
     private String modulePath;
     @Parameter
     private String[] javaOptions;
+    @Parameter
+    private String[] arguments;
 
     // Windows specific parameters
     @Parameter
@@ -178,6 +182,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(parameters, "--description", description);
         addParameter(parameters, "--runtime-image", runtimeImage);
         addParameter(parameters, "--input", input);
+        addParameter(parameters, "--install-dir", installDir);
         addParameter(parameters, "--vendor", vendor);
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
@@ -188,6 +193,11 @@ public class JPackageMojo extends AbstractMojo {
         if (javaOptions != null && javaOptions.length > 0) {
             String options = String.join(" ", javaOptions);
             addParameter(parameters, "--java-options", options);
+        }
+
+        if (arguments != null && arguments.length > 0) {
+            String appArgs = String.join(" ", arguments);
+            addParameter(parameters, "--arguments", appArgs);
         }
 
         if (isMac()) {
