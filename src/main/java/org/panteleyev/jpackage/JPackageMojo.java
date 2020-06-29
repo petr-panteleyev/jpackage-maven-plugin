@@ -194,9 +194,10 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(parameters, "--java-options", options);
         }
 
-        if (arguments != null && arguments.length > 0) {
-            String appArgs = String.join(" ", arguments);
-            addParameter(parameters, "--arguments", appArgs);
+        if (arguments != null) {
+            for (String argument : arguments) {
+                addParameter(parameters, "--arguments", argument);
+            }
         }
 
         if (isMac()) {
