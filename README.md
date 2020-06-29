@@ -7,13 +7,14 @@ Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available in
 
 ## Usage
 
-This plugin requires ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
-tool = "jpackage". If ```jpackage``` cannot be found for any reason the build fails.
+This plugin expects ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
+tool = "jpackage". If ```jpackage``` cannot be found using toolchain then plugin will try to use 'jpackage' executable
+from path specified by ```java.home``` system property.
 
 ## Configuration
 
 There are generic parameters as well as OS-specific parameters for OS X and Windows.
-Plugin determines OS name using ```${os.name}``` property in order to configure OS-specific parameters.
+Plugin determines OS name using ```os.name``` system property in order to configure OS-specific parameters.
 
 Generic parameters should be placed in the root plugin configuration. OS-specific parameters should be separated via
 executions. Id of the executions are irrelevant however using OS names improves usability.
@@ -54,11 +55,14 @@ With above execution configuration the following command lines can be used:
 |vendor|--vendor &lt;vendor string>|
 |runtimeImage|--runtime-image &lt;file path>|
 |input|--input &lt;input path>|
+|installDir|--install-dir &lt;file path>|
 |module|--module &lt;module name>[/&lt;main class>]|
 |modulePath|--module-path &lt;module path>...|
 |mainClass|--main-class &lt;class name>|
 |mainJar|--main-jar &lt;main jar file>|
 |icon|--icon &lt;icon file path>|
+|verbose|--verbose|
+|arguments|--arguments &lt;main class arguments>|
 
 ### Windows Specific Parameters
 
@@ -106,6 +110,21 @@ With above execution configuration the following command lines can be used:
 |RPM|rpm|
 |DEB|deb|
 
+### Default Command-Line Arguments
+
+Default command line arguments are passed to the main class when the application is started without providing arguments.
+Each argument should be specified using &lt;argument> configuration parameter.
+
+_Example:_
+
+```$xml
+<arguments>
+    <argument>SomeArgument</argument>
+    <argument>Argument with spaces</argument>
+    <argument>Argument with "quotes"</argument>
+</arguments>
+```
+
 ## Samples
 
 ### Application image with full JRE
@@ -147,3 +166,7 @@ With above execution configuration the following command lines can be used:
     </executions>
 </plugin>
 ```
+
+## References
+
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/14/jpackage/packaging-tool-user-guide.pdf)

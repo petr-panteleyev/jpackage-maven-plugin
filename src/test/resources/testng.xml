@@ -1,0 +1,14 @@
+<!--
+  ~ Copyright (c) Petr Panteleyev. All rights reserved.
+  ~ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+  -->
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Money Manager Application Unit Tests">
+    <test name="Mojo">
+        <classes>
+            <class name="org.panteleyev.jpackage.TestStringUtil"/>
+        </classes>
+    </test>
+</suite>

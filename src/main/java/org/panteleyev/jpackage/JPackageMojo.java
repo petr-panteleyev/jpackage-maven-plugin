@@ -16,6 +16,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +25,7 @@ import java.util.List;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
 import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
+import static org.panteleyev.jpackage.StringUtil.escape;
 
 @Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
 @Execute(goal = "jpackage", phase = LifecyclePhase.PACKAGE)
@@ -37,6 +39,8 @@ public class JPackageMojo extends AbstractMojo {
     private MavenSession session;
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
+    @Parameter
+    private boolean verbose;
     @Parameter
     private ImageType type;
     @Parameter(required = true)
@@ -130,15 +134,28 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
+    private String getJPackageFromJavaHome() throws MojoExecutionException {
+        getLog().warn("Getting jpackage from java.home");
+
+        String javaHome = System.getProperty("java.home");
+        if (javaHome == null) {
+            throw new MojoExecutionException("java.home is not set");
+        }
+
+        return javaHome + File.separator + "bin" + File.separator + "jpackage";
+    }
+
     private String getJPackageExecutable() throws MojoExecutionException {
         Toolchain jdk = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (jdk == null) {
-            throw new MojoExecutionException("Toolchain not configured");
+            getLog().warn("Toolchain not configured");
+            return getJPackageFromJavaHome();
         }
 
         String jpackage = jdk.findTool("jpackage");
         if (jpackage == null) {
-            throw new MojoExecutionException("jpackage is not part of configured toolchain");
+            getLog().warn("jpackage is not part of configured toolchain");
+            return getJPackageFromJavaHome();
         }
 
         return jpackage;
@@ -173,6 +190,7 @@ public class JPackageMojo extends AbstractMojo {
     private void buildParameters(List<String> parameters) {
         getLog().info("=== Parameters:");
 
+        addParameter(parameters, "--verbose", verbose);
         addParameter(parameters, "--type", type);
         addParameter(parameters, "--name", name);
         addParameter(parameters, "--app-version", appVersion);
@@ -189,14 +207,16 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(parameters, "--module-path", modulePath);
         addParameter(parameters, "--icon", icon);
 
-        if (javaOptions != null && javaOptions.length > 0) {
-            String options = String.join(" ", javaOptions);
-            addParameter(parameters, "--java-options", options);
+        if (javaOptions != null) {
+            for (String option : javaOptions) {
+                addParameter(parameters, "--java-options", escape(option));
+            }
         }
 
-        if (arguments != null && arguments.length > 0) {
-            String appArgs = String.join(" ", arguments);
-            addParameter(parameters, "--arguments", appArgs);
+        if (arguments != null) {
+            for (String arg : arguments) {
+                addParameter(parameters, "--arguments", escape(arg));
+            }
         }
 
         if (isMac()) {
@@ -230,7 +250,6 @@ public class JPackageMojo extends AbstractMojo {
         if (value == null || value.isEmpty()) {
             return;
         }
-        value = value.contains(" ") ? "\"" + value + "\"" : value;
 
         getLog().info(name + " " + value);
         params.add(name);

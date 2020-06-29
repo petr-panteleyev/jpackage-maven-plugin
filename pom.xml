@@ -6,7 +6,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -41,9 +41,11 @@
         <maven.compiler.target>8</maven.compiler.target>
         <!-- Dependencies -->
         <mavenProjectVersion>2.2.1</mavenProjectVersion>
+        <testNgVersion>6.14.3</testNgVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
         <mavenPluginPluginVersion>3.6.0</mavenPluginPluginVersion>
         <mavenSourcePluginVersion>3.2.0</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
@@ -72,6 +74,12 @@
             <artifactId>maven-project</artifactId>
             <version>${mavenProjectVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testNgVersion}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,6 +107,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${mavenSurefirePluginVersion}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
