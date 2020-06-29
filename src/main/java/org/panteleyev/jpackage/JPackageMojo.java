@@ -117,8 +117,15 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException {
-        String jpackage = getJPackageExecutable();
-        getLog().info("Using: " + jpackage);
+        String jpackage;
+        try {
+            jpackage = getJPackageExecutable();
+            getLog().info("Using: " + jpackage);
+        } catch (Exception e) {
+            getLog().warn("Can't get jpackage location by toolchaing, trying with 'jpackage': " +
+                    e.getMessage());
+            jpackage = "jpackage";
+        }
 
         validateParameters();
 
