@@ -231,7 +231,7 @@ public class JPackageMojo extends AbstractMojo {
         if (value == null || value.isEmpty()) {
             return;
         }
-        value = value.contains(" ") ? "\"" + value + "\"" : value;
+        value = "\"" + value.replace("\"", "\\\"") + "\"";
 
         getLog().info(name + " " + value);
         params.add(name);
