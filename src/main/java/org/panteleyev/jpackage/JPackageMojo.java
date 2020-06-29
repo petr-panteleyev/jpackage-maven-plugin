@@ -16,6 +16,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -151,19 +153,16 @@ public class JPackageMojo extends AbstractMojo {
     private void execute(String cmd) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> parameters = new ArrayList<>();
-        parameters.add(cmd);
+        parameters.add(cmd.contains(" ") ? ("\"" + cmd + "\"") : cmd);
 
         buildParameters(parameters);
         processBuilder.command(parameters);
 
         Process process = processBuilder.start();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                getLog().info(line);
-            }
-        }
+        getLog().info("jpackage output:");
+        logCmdOutput(process.getInputStream());
+        logCmdOutput(process.getErrorStream());
 
         int status = process.waitFor();
         if (status != 0) {
@@ -231,6 +230,7 @@ public class JPackageMojo extends AbstractMojo {
         if (value == null || value.isEmpty()) {
             return;
         }
+        value = value.contains(" ") ? "\"" + value + "\"" : value;
 
         getLog().info(name + " " + value);
         params.add(name);
@@ -252,5 +252,14 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         addParameter(params, name, value.getValue());
+    }
+
+    private void logCmdOutput(InputStream stream) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                getLog().info(line);
+            }
+        }
     }
 }
