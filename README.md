@@ -3,6 +3,7 @@
 Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available in JDK-14.
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
+[![Licence](https://img.shields.io/badge/Java-1.8-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.panteleyev/jpackage-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.panteleyev/jpackage-maven-plugin/)
 
 ## Usage
@@ -109,6 +110,19 @@ With above execution configuration the following command lines can be used:
 |MSI|msi|
 |RPM|rpm|
 |DEB|deb|
+
+### Relative Path Resolution
+
+The following plugin parameters define directory or file location:
+* destination
+* icon
+* input
+* installDir 
+* mainJar
+* modulePath
+* runtimeImage
+ 
+If path is not absolute is will be resolved as relative to ```${project.basedir}```.
 
 ### Default Command-Line Arguments
 

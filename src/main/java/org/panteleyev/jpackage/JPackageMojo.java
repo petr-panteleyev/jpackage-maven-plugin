@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
@@ -178,34 +179,36 @@ public class JPackageMojo extends AbstractMojo {
         Process process = processBuilder.start();
 
         getLog().info("jpackage output:");
+
+        int status = process.waitFor();
+
         logCmdOutput(process.getInputStream());
         logCmdOutput(process.getErrorStream());
 
-        int status = process.waitFor();
         if (status != 0) {
             throw new MojoExecutionException("Error while executing jpackage");
         }
     }
 
     private void buildParameters(List<String> parameters) {
-        getLog().info("=== Parameters:");
+        getLog().info("jpackage parameters:");
 
         addParameter(parameters, "--verbose", verbose);
         addParameter(parameters, "--type", type);
         addParameter(parameters, "--name", name);
         addParameter(parameters, "--app-version", appVersion);
-        addParameter(parameters, "--dest", destination);
+        addPathParameter(parameters, "--dest", destination);
         addParameter(parameters, "--copyright", copyright);
         addParameter(parameters, "--description", description);
-        addParameter(parameters, "--runtime-image", runtimeImage);
-        addParameter(parameters, "--input", input);
-        addParameter(parameters, "--install-dir", installDir);
+        addPathParameter(parameters, "--runtime-image", runtimeImage);
+        addPathParameter(parameters, "--input", input);
+        addPathParameter(parameters, "--install-dir", installDir);
         addParameter(parameters, "--vendor", vendor);
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
-        addParameter(parameters, "--main-jar", mainJar);
-        addParameter(parameters, "--module-path", modulePath);
-        addParameter(parameters, "--icon", icon);
+        addPathParameter(parameters, "--main-jar", mainJar);
+        addPathParameter(parameters, "--module-path", modulePath);
+        addPathParameter(parameters, "--icon", icon);
 
         if (javaOptions != null) {
             for (String option : javaOptions) {
@@ -242,8 +245,6 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(parameters, "--linux-app-category", linuxAppCategory);
             addParameter(parameters, "--linux-shortcut", linuxShortcut);
         }
-
-        getLog().info("===");
     }
 
     private void addParameter(List<String> params, String name, String value) {
@@ -251,9 +252,24 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info(name + " " + value);
+        getLog().info("  " + name + " " + value);
         params.add(name);
         params.add(value);
+    }
+
+    private void addPathParameter(List<String> params, String name, String value) {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+
+        Path path = new File(value).toPath();
+        if (!path.isAbsolute()) {
+            String oldValue = value;
+            value = project.getBasedir().getAbsolutePath() + File.separator + value;
+            getLog().debug("Resolving path " + oldValue + " to " + value);
+        }
+
+        addParameter(params, name, value);
     }
 
     private void addParameter(List<String> params, String name, boolean value) {
@@ -261,7 +277,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info(name);
+        getLog().info("  " + name);
         params.add(name);
     }
 
