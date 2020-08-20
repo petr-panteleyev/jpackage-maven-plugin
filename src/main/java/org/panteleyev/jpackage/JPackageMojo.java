@@ -143,7 +143,11 @@ public class JPackageMojo extends AbstractMojo {
             throw new MojoExecutionException("java.home is not set");
         }
 
-        return javaHome + File.separator + "bin" + File.separator + "jpackage";
+        String jpackage = javaHome + File.separator + "bin" + File.separator + "jpackage";
+        if (isWindows()) {
+            jpackage = jpackage + ".exe";
+        }
+        return jpackage;
     }
 
     private String getJPackageExecutable() throws MojoExecutionException {
