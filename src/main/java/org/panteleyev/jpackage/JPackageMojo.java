@@ -213,7 +213,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(parameters, "--vendor", vendor);
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
-        addPathParameter(parameters, "--main-jar", mainJar);
+        addParameter(parameters, "--main-jar", mainJar);
         addPathParameter(parameters, "--module-path", modulePath);
         addPathParameter(parameters, "--icon", icon);
 
