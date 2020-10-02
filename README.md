@@ -57,6 +57,8 @@ With above execution configuration the following command lines can be used:
 |runtimeImage|--runtime-image &lt;file path>|
 |input|--input &lt;input path>|
 |installDir|--install-dir &lt;file path>|
+|resourceDir|--resource-dir &lt;resource dir path>|
+|temp|--temp &lt;temp dir path>|
 |module|--module &lt;module name>[/&lt;main class>]|
 |modulePath|--module-path &lt;module path>...|
 |mainClass|--main-class &lt;class name>|
