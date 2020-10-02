@@ -69,6 +69,8 @@ public class JPackageMojo extends AbstractMojo {
     @Parameter
     private String mainJar;
     @Parameter
+    private String temp;
+    @Parameter
     private String copyright;
     @Parameter
     private String description;
@@ -214,6 +216,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
         addParameter(parameters, "--main-jar", mainJar);
+        addParameter(parameters, "--temp", temp);
         addPathParameter(parameters, "--module-path", modulePath);
         addPathParameter(parameters, "--icon", icon);
 
