@@ -1,6 +1,6 @@
 # JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available in JDK-14.
+Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available since JDK-14.
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
 [![Licence](https://img.shields.io/badge/Java-1.8-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
@@ -57,6 +57,8 @@ With above execution configuration the following command lines can be used:
 |runtimeImage|--runtime-image &lt;file path>|
 |input|--input &lt;input path>|
 |installDir|--install-dir &lt;file path>|
+|resourceDir|--resource-dir &lt;resource dir path>|
+|temp|--temp &lt;temp dir path>|
 |module|--module &lt;module name>[/&lt;main class>]|
 |modulePath|--module-path &lt;module path>...|
 |mainClass|--main-class &lt;class name>|
@@ -117,10 +119,11 @@ The following plugin parameters define directory or file location:
 * destination
 * icon
 * input
-* installDir 
-* mainJar
+* installDir
+* resourceDir 
 * modulePath
 * runtimeImage
+* temp
  
 If path is not absolute is will be resolved as relative to ```${project.basedir}```.
 
@@ -183,4 +186,4 @@ _Example:_
 
 ## References
 
-[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/14/jpackage/packaging-tool-user-guide.pdf)
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf)

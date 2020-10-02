@@ -58,6 +58,8 @@ public class JPackageMojo extends AbstractMojo {
     private String input;
     @Parameter
     private String installDir;
+    @Parameter
+    private String resourceDir;
     @Parameter(required = true)
     private String destination;
     @Parameter
@@ -66,6 +68,8 @@ public class JPackageMojo extends AbstractMojo {
     private String mainClass;
     @Parameter
     private String mainJar;
+    @Parameter
+    private String temp;
     @Parameter
     private String copyright;
     @Parameter
@@ -207,10 +211,12 @@ public class JPackageMojo extends AbstractMojo {
         addPathParameter(parameters, "--runtime-image", runtimeImage);
         addPathParameter(parameters, "--input", input);
         addPathParameter(parameters, "--install-dir", installDir);
+        addPathParameter(parameters, "--resource-dir", resourceDir);
         addParameter(parameters, "--vendor", vendor);
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
-        addPathParameter(parameters, "--main-jar", mainJar);
+        addParameter(parameters, "--main-jar", mainJar);
+        addPathParameter(parameters, "--temp", temp);
         addPathParameter(parameters, "--module-path", modulePath);
         addPathParameter(parameters, "--icon", icon);
 
