@@ -31,7 +31,9 @@ import static org.panteleyev.jpackage.StringUtil.escape;
 @Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
 @Execute(goal = "jpackage", phase = LifecyclePhase.PACKAGE)
 public class JPackageMojo extends AbstractMojo {
+    private static final String JPACKAGE_HOME_ENV = "JPACKAGE_HOME";
     private static final String TOOLCHAIN = "jdk";
+    private static final String EXECUTABLE = "jpackage";
 
     @Component
     private ToolchainManager toolchainManager;
@@ -126,48 +128,76 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException {
-        String jpackage = getJPackageExecutable();
-        getLog().info("Using: " + jpackage);
+        String executable = getJPackageExecutable();
+        if (executable == null) {
+            throw new MojoExecutionException("Failed to find " + EXECUTABLE);
+        }
+
+        getLog().info("Using: " + executable);
 
         validateParameters();
 
         try {
-            execute(jpackage);
+            execute(executable);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new MojoExecutionException(ex.getMessage());
         }
     }
 
-    private String getJPackageFromJavaHome() throws MojoExecutionException {
-        getLog().warn("Getting jpackage from java.home");
-
-        String javaHome = System.getProperty("java.home");
-        if (javaHome == null) {
-            throw new MojoExecutionException("java.home is not set");
+    private String getJPackageFromJdkHome(String jdkHome) {
+        if (jdkHome == null || jdkHome.isEmpty()) {
+            return null;
         }
 
-        String jpackage = javaHome + File.separator + "bin" + File.separator + "jpackage";
+        getLog().info("Looking for " + EXECUTABLE + " in " + jdkHome);
+
+        String executable = jdkHome + File.separator + "bin" + File.separator + EXECUTABLE;
         if (isWindows()) {
-            jpackage = jpackage + ".exe";
+            executable = executable + ".exe";
         }
-        return jpackage;
+
+        if (new File(executable).exists()) {
+            return executable;
+        } else {
+            getLog().warn("File " + executable + " does not exist");
+            return null;
+        }
     }
 
-    private String getJPackageExecutable() throws MojoExecutionException {
+    private String getJPackageFromToolchain() {
+        getLog().info("Looking for " + EXECUTABLE + " in toolchain");
+
         Toolchain jdk = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (jdk == null) {
             getLog().warn("Toolchain not configured");
-            return getJPackageFromJavaHome();
+            return null;
         }
 
-        String jpackage = jdk.findTool("jpackage");
-        if (jpackage == null) {
-            getLog().warn("jpackage is not part of configured toolchain");
-            return getJPackageFromJavaHome();
+        String executable = jdk.findTool(EXECUTABLE);
+        if (executable == null) {
+            getLog().warn(EXECUTABLE + " is not part of configured toolchain");
+            return null;
         }
 
-        return jpackage;
+        return executable;
+    }
+
+    private String getJPackageExecutable() {
+        // Priority 1: JPACKAGE_HOME
+        String executable = getJPackageFromJdkHome(System.getenv(JPACKAGE_HOME_ENV));
+        if (executable != null) {
+            return executable;
+        }
+
+        // Priority 2: maven-toolchain-plugin
+        executable = getJPackageFromToolchain();
+        if (executable != null) {
+            return executable;
+        }
+
+        // Priority 3: java.home
+        return getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
     private void validateParameters() {
@@ -186,7 +216,7 @@ public class JPackageMojo extends AbstractMojo {
 
         Process process = processBuilder.start();
 
-        getLog().info("jpackage output:");
+        getLog().info(EXECUTABLE + " output:");
 
         int status = process.waitFor();
 
@@ -194,7 +224,7 @@ public class JPackageMojo extends AbstractMojo {
         logCmdOutput(process.getErrorStream());
 
         if (status != 0) {
-            throw new MojoExecutionException("Error while executing jpackage");
+            throw new MojoExecutionException("Error while executing " + EXECUTABLE);
         }
     }
 

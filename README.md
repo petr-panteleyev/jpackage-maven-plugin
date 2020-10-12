@@ -6,11 +6,14 @@ Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available si
 [![Licence](https://img.shields.io/badge/Java-1.8-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.panteleyev/jpackage-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.panteleyev/jpackage-maven-plugin/)
 
-## Usage
+## Finding jpackage
 
-This plugin expects ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
-tool = "jpackage". If ```jpackage``` cannot be found using toolchain then plugin will try to use 'jpackage' executable
-from path specified by ```java.home``` system property.
+Plugin searches for ```jpackage``` executable using the following priority list:
+1. Environment variable ```JPACKAGE_HOME```. If specific version of jpackage is required then this variable must point
+to the corresponding JDK same way as ```JAVA_HOME```.
+2. ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
+tool = "jpackage".
+3. ```java.home``` system property.
 
 ## Configuration
 
