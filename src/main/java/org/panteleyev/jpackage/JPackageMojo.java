@@ -28,6 +28,12 @@ import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
 import static org.panteleyev.jpackage.StringUtil.escape;
 
+/**
+ * <p>Generates application package.</p>
+ * <p>Each plugin parameter defines <code>jpackage</code> option.
+ * For detailed information about these options please refer to
+ * <a href="https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
+ */
 @Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
 @Execute(goal = "jpackage", phase = LifecyclePhase.PACKAGE)
 public class JPackageMojo extends AbstractMojo {
@@ -42,88 +48,335 @@ public class JPackageMojo extends AbstractMojo {
     private MavenSession session;
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
+
+    /**
+     * --verbose
+     *
+     * @since 0.0.4
+     */
     @Parameter
     private boolean verbose;
+
+    /**
+     * <p>--type &lt;type></p>
+     *
+     * <p>Possible values:</p>
+     * <table>
+     *     <tr>
+     *         <th>Plugin</th><th>JPackage</th>
+     *     </tr>
+     *     <tr><td>APP_IMAGE</td><td>app-image</td></tr>
+     *     <tr><td>DMG</td><td>dmg</td></tr>
+     *     <tr><td>PKG</td><td>pkg</td></tr>
+     *     <tr><td>EXE</td><td>exe</td></tr>
+     *     <tr><td>MSI</td><td>msi</td></tr>
+     *     <tr><td>DEB</td><td>deb</td></tr>
+     * </table>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private ImageType type;
+
+    /**
+     * --name &lt;name>
+     *
+     * @since 0.0.1
+     */
     @Parameter(required = true)
     private String name;
-    @Parameter(required = true)
+
+    /**
+     * --app-version &lt;version>
+     *
+     * @since 0.0.1
+     */
+    @Parameter(defaultValue = "${project.version}")
     private String appVersion;
+
+    /**
+     * --vendor &lt;vendor string>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String vendor;
+
+    /**
+     * --icon &lt;icon file path>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String icon;
+
+    /**
+     * --runtime-image &lt;file path>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String runtimeImage;
+
+    /**
+     * --input &lt;input path>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String input;
+
+    /**
+     * --install-dir &lt;file path>
+     *
+     * @since 0.0.4
+     */
     @Parameter
     private String installDir;
+
+    /**
+     * --resource-dir &lt;resource dir path>
+     *
+     * @since 1.1.0
+     */
     @Parameter
     private String resourceDir;
+
+    /**
+     * --dest &lt;destination path>
+     *
+     * @since 0.0.1
+     */
     @Parameter(required = true)
     private String destination;
+
+    /**
+     * --module &lt;module name>[/&lt;main class>]
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String module;
+
+    /**
+     * --main-class &lt;class name>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String mainClass;
+
+    /**
+     * --main-jar &lt;main jar file>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String mainJar;
+
+    /**
+     * --temp &lt;temp dir path>
+     *
+     * @since 1.1.0
+     */
     @Parameter
     private String temp;
+
+    /**
+     * --copyright &lt;copyright string>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String copyright;
+
+    /**
+     * --description &lt;description string>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String description;
+
+    /**
+     * --module-path &lt;module path>...
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String modulePath;
+
+    /**
+     * --java-options &lt;JVM option>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String[] javaOptions;
+
+    /**
+     * --arguments &lt;main class arguments>
+     *
+     * @since 0.0.4
+     */
     @Parameter
     private String[] arguments;
 
     // Windows specific parameters
+
+    /**
+     * --win-menu
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private boolean winMenu;
+
+    /**
+     * --win-dir-chooser
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private boolean winDirChooser;
+
+    /**
+     * --win-upgrade-uuid &lt;id string>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String winUpgradeUuid;
+
+    /**
+     * --win-menu-group &lt;menu group name>
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private String winMenuGroup;
+
+    /**
+     * --win-shortcut
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private boolean winShortcut;
+
+    /**
+     * --win-per-user-install
+     *
+     * @since 0.0.1
+     */
     @Parameter
     private boolean winPerUserInstall;
 
     // OS X specific parameters
+
+    /**
+     * --mac-package-identifier &lt;ID string>
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private String macPackageIdentifier;
+
+    /**
+     * --mac-package-name &lt;name string>
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private String macPackageName;
+
+    /**
+     * --mac-package-signing-prefix &lt;prefix string>
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private String macPackageSigningPrefix;
+
+    /**
+     * --mac-sign
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private boolean macSign;
+
+    /**
+     * --mac-signing-keychain &lt;file path>
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private String macSigningKeychain;
+
+    /**
+     * --mac-signing-key-user-name &lt;team name>
+     *
+     * @since 0.0.2
+     */
     @Parameter
     private String macSigningKeyUserName;
 
     // Linux specific parameters
+
+    /**
+     * --linux-package-name &lt;package name>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxPackageName;
+
+    /**
+     * --linux-deb-maintainer &lt;email address>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxDebMaintainer;
+
+    /**
+     * --linux-menu-group &lt;menu-group-name>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxMenuGroup;
+
+    /**
+     * --linux-rpm-license-type &lt;type string>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxRpmLicenseType;
+
+    /**
+     * --linux-app-release &lt;release value>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxAppRelease;
+
+    /**
+     * --linux-app-category &lt;category value>
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private String linuxAppCategory;
+
+    /**
+     * --linux-shortcut
+     *
+     * @since 0.0.3
+     */
     @Parameter
     private boolean linuxShortcut;
 
@@ -134,8 +387,6 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         getLog().info("Using: " + executable);
-
-        validateParameters();
 
         try {
             execute(executable);
@@ -198,12 +449,6 @@ public class JPackageMojo extends AbstractMojo {
 
         // Priority 3: java.home
         return getJPackageFromJdkHome(System.getProperty("java.home"));
-    }
-
-    private void validateParameters() {
-        if (appVersion == null) {
-            appVersion = project.getVersion();
-        }
     }
 
     private void execute(String cmd) throws Exception {
