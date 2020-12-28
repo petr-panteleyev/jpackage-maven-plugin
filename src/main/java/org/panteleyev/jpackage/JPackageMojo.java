@@ -8,7 +8,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -34,9 +33,10 @@ import static org.panteleyev.jpackage.StringUtil.escape;
  * For detailed information about these options please refer to
  * <a href="https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
  */
-@Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
-@Execute(goal = "jpackage", phase = LifecyclePhase.PACKAGE)
+@Mojo(name = JPackageMojo.GOAL, defaultPhase = LifecyclePhase.NONE)
 public class JPackageMojo extends AbstractMojo {
+    public static final String GOAL = "jpackage";
+
     private static final String JPACKAGE_HOME_ENV = "JPACKAGE_HOME";
     private static final String TOOLCHAIN = "jdk";
     private static final String EXECUTABLE = "jpackage";

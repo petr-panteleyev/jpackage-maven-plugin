@@ -50,6 +50,7 @@ With above execution configuration the following command lines can be used:
 #### Relative Path Resolution
 
 The following plugin parameters define directory or file location:
+
 * destination
 * icon
 * input
@@ -90,4 +91,48 @@ _Example:_
     <argument>Argument with spaces</argument>
     <argument>Argument with "quotes"</argument>
 </arguments>
+```
+
+### Assembling Dependencies
+
+Before executing ```jpackage``` all runtime dependencies should be copied into a single folder together with main
+application jar. This example shows how to do this via ```maven-dependency-plugin```.
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+            <outputDirectory>target/jmods</outputDirectory>
+        </configuration>
+    </plugin>
+    
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>copy-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                    <includeScope>runtime</includeScope>
+                    <outputDirectory>target/jmods</outputDirectory>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+
+    <plugin>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>jpackage-maven-plugin</artifactId>
+        <configuration>
+            <modulePath>target/jmods</modulePath>
+        </configuration>
+    </plugin>
+</plugins>
+
 ```
