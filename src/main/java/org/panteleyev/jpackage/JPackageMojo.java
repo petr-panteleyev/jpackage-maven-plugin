@@ -222,6 +222,50 @@ public class JPackageMojo extends AbstractMojo {
     @Parameter
     private String[] arguments;
 
+    /**
+     * --license-file &lt;license file path>
+     *
+     * @since 1.3.0
+     */
+    @Parameter
+    private String licenseFile;
+
+    /**
+     * <p>--file-associations &lt;file association property file></p>
+     *
+     * <p>Each property file is specified by a separate &lt;fileAssociation> parameter.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;fileAssociations>
+     *     &lt;fileAssociation>src/properties/java.properties&lt;/fileAssociation>
+     *     &lt;fileAssociation>src/properties/cpp.properties&lt;/fileAssociation>
+     * &lt;/fileAssociations>
+     * </pre>
+     * </p>
+     *
+     * @since 1.3.0
+     */
+    @Parameter
+    private String[] fileAssociations;
+
+    /**
+     * <p>--add-launcher &lt;name>=&lt;file></p>
+     *
+     * <p>Application launchers specified by one</p>
+     * <pre>
+     * &lt;launcher>
+     *     &lt;name>name-of-the-launcher&lt;/name>
+     *     &lt;file>/path/to/launcher.properties&lt;/file>
+     * &lt;/launcher>
+     * </pre>
+     *
+     * <p>element for each launcher.</p>
+     *
+     * @since 1.3.0
+     */
+    @Parameter
+    private Launcher[] launchers;
+
     // Windows specific parameters
 
     /**
@@ -271,6 +315,14 @@ public class JPackageMojo extends AbstractMojo {
      */
     @Parameter
     private boolean winPerUserInstall;
+
+    /**
+     * --win-console
+     *
+     * @since 1.3.0
+     */
+    @Parameter
+    private boolean winConsole;
 
     // OS X specific parameters
 
@@ -494,6 +546,7 @@ public class JPackageMojo extends AbstractMojo {
         addPathParameter(parameters, "--temp", temp);
         addPathParameter(parameters, "--module-path", modulePath);
         addPathParameter(parameters, "--icon", icon);
+        addPathParameter(parameters, "--license-file", licenseFile);
 
         if (javaOptions != null) {
             for (String option : javaOptions) {
@@ -504,6 +557,19 @@ public class JPackageMojo extends AbstractMojo {
         if (arguments != null) {
             for (String arg : arguments) {
                 addParameter(parameters, "--arguments", escape(arg));
+            }
+        }
+
+        if (fileAssociations != null) {
+            for (String association : fileAssociations) {
+                addPathParameter(parameters, "--file-associations", association);
+            }
+        }
+
+        if (launchers != null) {
+            for (Launcher launcher : launchers) {
+                addParameter(parameters, "--add-launcher",
+                    launcher.getName() + "=" + resolvePath(launcher.getFile()));
             }
         }
 
@@ -521,6 +587,7 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(parameters, "--win-menu-group", winMenuGroup);
             addParameter(parameters, "--win-shortcut", winShortcut);
             addParameter(parameters, "--win-per-user-install", winPerUserInstall);
+            addParameter(parameters, "--win-console", winConsole);
         } else if (isLinux()) {
             addParameter(parameters, "--linux-package-name", linuxPackageName);
             addParameter(parameters, "--linux-deb-maintainer", linuxDebMaintainer);
@@ -547,14 +614,21 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
+        addParameter(params, name, resolvePath(value));
+    }
+
+    private String resolvePath(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+
         Path path = new File(value).toPath();
         if (!path.isAbsolute()) {
             String oldValue = value;
             value = project.getBasedir().getAbsolutePath() + File.separator + value;
             getLog().debug("Resolving path " + oldValue + " to " + value);
         }
-
-        addParameter(params, name, value);
+        return value;
     }
 
     private void addParameter(List<String> params, String name, boolean value) {

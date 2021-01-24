@@ -59,6 +59,8 @@ The following plugin parameters define directory or file location:
 * modulePath
 * runtimeImage
 * temp
+* licenseFile
+* launcher.file
  
 If path is not absolute is will be resolved as relative to ```${project.basedir}```.
 
@@ -92,6 +94,41 @@ _Example:_
     <argument>Argument with "quotes"</argument>
 </arguments>
 ```
+
+#### Additional Launcher
+
+Additional launchers provide the opportunity to install alternative ways to start an application.
+
+_Example:_
+
+```xml
+<launchers>
+    <launcher>
+        <name>App1</name>
+        <file>src/resources/App1.properties</file>
+    </launcher>
+    <launcher>
+        <name>App2</name>
+        <file>src/resources/App2.properties</file>
+    </launcher>
+</launchers>
+```
+
+#### File Associations
+
+If you want your application to be started when a user opens a specific type of file, use ```<fileAssociations>``` 
+configuration.
+
+_Example:_
+
+```xml
+<fileAssociations>
+    <fileAssociation>src/properties/java.properties</fileAssociation>
+    <fileAssociation>src/properties/cpp.properties</fileAssociation>
+</fileAssociations>
+```
+
+Note: apparently this option does not work for modular applications.
 
 ### Assembling Dependencies
 
