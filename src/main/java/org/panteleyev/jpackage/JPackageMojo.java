@@ -16,8 +16,6 @@ import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -40,6 +38,9 @@ public class JPackageMojo extends AbstractMojo {
     private static final String JPACKAGE_HOME_ENV = "JPACKAGE_HOME";
     private static final String TOOLCHAIN = "jdk";
     private static final String EXECUTABLE = "jpackage";
+
+    private static final String DRY_RUN_PROPERTY = "jpackage.dryRun";
+    private boolean dryRun;
 
     @Component
     private ToolchainManager toolchainManager;
@@ -433,18 +434,32 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException {
-        String executable = getJPackageExecutable();
+        dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
+
+        Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
+        if (tc != null) {
+            getLog().info("Toolchain in jpackage-maven-plugin: " + tc);
+        }
+
+        String executable = getJPackageExecutable(tc);
         if (executable == null) {
             throw new MojoExecutionException("Failed to find " + EXECUTABLE);
         }
 
-        getLog().info("Using: " + executable);
+        getLog().debug("Using: " + executable);
 
-        try {
-            execute(executable);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new MojoExecutionException(ex.getMessage());
+        List<String> parameters = new ArrayList<>();
+        parameters.add(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
+        buildParameters(parameters);
+
+        if (dryRun) {
+            getLog().warn("Dry-run mode, not executing " + EXECUTABLE);
+        } else {
+            try {
+                execute(parameters);
+            } catch (Exception ex) {
+                throw new MojoExecutionException(ex.getMessage());
+            }
         }
     }
 
@@ -453,7 +468,7 @@ public class JPackageMojo extends AbstractMojo {
             return null;
         }
 
-        getLog().info("Looking for " + EXECUTABLE + " in " + jdkHome);
+        getLog().debug("Looking for " + EXECUTABLE + " in " + jdkHome);
 
         String executable = jdkHome + File.separator + "bin" + File.separator + EXECUTABLE;
         if (isWindows()) {
@@ -468,25 +483,20 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
-    private String getJPackageFromToolchain() {
-        getLog().info("Looking for " + EXECUTABLE + " in toolchain");
-
-        Toolchain jdk = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
-        if (jdk == null) {
-            getLog().warn("Toolchain not configured");
+    private String getJPackageFromToolchain(Toolchain tc) {
+        if (tc == null) {
             return null;
         }
 
-        String executable = jdk.findTool(EXECUTABLE);
+        String executable = tc.findTool(EXECUTABLE);
         if (executable == null) {
             getLog().warn(EXECUTABLE + " is not part of configured toolchain");
-            return null;
         }
 
         return executable;
     }
 
-    private String getJPackageExecutable() {
+    private String getJPackageExecutable(Toolchain tc) {
         // Priority 1: JPACKAGE_HOME
         String executable = getJPackageFromJdkHome(System.getenv(JPACKAGE_HOME_ENV));
         if (executable != null) {
@@ -494,7 +504,7 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         // Priority 2: maven-toolchain-plugin
-        executable = getJPackageFromToolchain();
+        executable = getJPackageFromToolchain(tc);
         if (executable != null) {
             return executable;
         }
@@ -503,30 +513,35 @@ public class JPackageMojo extends AbstractMojo {
         return getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
-    private void execute(String cmd) throws Exception {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> parameters = new ArrayList<>();
-        parameters.add(cmd.contains(" ") ? ("\"" + cmd + "\"") : cmd);
+    private void execute(List<String> parameters) throws Exception {
+        Process process = new ProcessBuilder()
+            .redirectErrorStream(true)
+            .command(parameters)
+            .start();
 
-        buildParameters(parameters);
-        processBuilder.command(parameters);
-
-        Process process = processBuilder.start();
-
-        getLog().info(EXECUTABLE + " output:");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                getLog().info(line);
+            }
+        }
 
         int status = process.waitFor();
-
-        logCmdOutput(process.getInputStream());
-        logCmdOutput(process.getErrorStream());
-
         if (status != 0) {
             throw new MojoExecutionException("Error while executing " + EXECUTABLE);
         }
     }
 
+    private void printLog(boolean info, String text) {
+        if (info) {
+            getLog().info(text);
+        } else {
+            getLog().debug(text);
+        }
+    }
+
     private void buildParameters(List<String> parameters) {
-        getLog().info("jpackage parameters:");
+        printLog(dryRun, "jpackage parameters:");
 
         addParameter(parameters, "--verbose", verbose);
         addParameter(parameters, "--type", type);
@@ -604,7 +619,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info("  " + name + " " + value);
+        printLog(dryRun, "  " + name + " " + value);
         params.add(name);
         params.add(value);
     }
@@ -636,7 +651,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info("  " + name);
+        printLog(dryRun, "  " + name);
         params.add(name);
     }
 
@@ -646,14 +661,5 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         addParameter(params, name, value.getValue());
-    }
-
-    private void logCmdOutput(InputStream stream) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                getLog().info(line);
-            }
-        }
     }
 }

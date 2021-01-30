@@ -43,9 +43,9 @@ executions. Id of the executions are irrelevant however using OS names improves 
 ```
 With above execution configuration the following command lines can be used:
 
-* for OS X package: ```mvn jpackage:jpackage@mac```
+* for OS X package: ```mvn clean package jpackage:jpackage@mac```
 
-* for Windows package: ```mvn jpackage:jpackage@win```
+* for Windows package: ```mvn clean package jpackage:jpackage@win```
 
 #### Relative Path Resolution
 
@@ -171,5 +171,14 @@ application jar. This example shows how to do this via ```maven-dependency-plugi
         </configuration>
     </plugin>
 </plugins>
+```
 
+### Dry Run Mode
+
+To print jpackage parameters without executing jpackage set ```jpackage.dryRun``` property to ```true```.
+
+_Example:_
+
+```
+mvn clean package jpackage:jpackage@win -Djpackage.dryRun=true
 ```
