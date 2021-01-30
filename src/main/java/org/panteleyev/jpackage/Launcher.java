@@ -4,9 +4,12 @@
  */
 package org.panteleyev.jpackage;
 
+import org.apache.maven.plugin.MojoFailureException;
+import java.io.File;
+
 public class Launcher {
     private String name;
-    private String file;
+    private File file;
 
     public String getName() {
         return name;
@@ -16,11 +19,21 @@ public class Launcher {
         this.name = name;
     }
 
-    public String getFile() {
+    public File getFile() {
         return file;
     }
 
-    public void setFile(String file) {
+    public void setFile(File file) {
         this.file = file;
+    }
+
+    public void validate() throws MojoFailureException {
+        if (name == null || name.isEmpty() || file == null) {
+            throw new MojoFailureException("Launcher parameters cannot be null or empty");
+        }
+
+        if (!file.exists()) {
+            throw new MojoFailureException("Launcher file " + file.getAbsolutePath() + " does not exist");
+        }
     }
 }

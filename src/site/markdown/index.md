@@ -23,3 +23,5 @@ To provide you with better understanding of some usages of the JPackage Maven Pl
 you can take a look into the following examples:
 
 * [Image with full JRE](./examples/full-jre.html)
+* [Configuration via executions](./examples/executions.html)
+* [Configuration via profiles](./examples/profiles.html)

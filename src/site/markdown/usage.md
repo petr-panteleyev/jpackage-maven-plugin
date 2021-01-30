@@ -19,33 +19,20 @@ tool = "jpackage".
 There are generic parameters as well as OS-specific parameters for OS X and Windows.
 Plugin determines OS name using ```os.name``` system property in order to configure OS-specific parameters.
 
-Generic parameters should be placed in the root plugin configuration. OS-specific parameters should be separated via
-executions. Id of the executions are irrelevant however using OS names improves usability.
+Generic parameters should be placed in the root plugin configuration. OS-specific parameters should be separated with
+executions or profiles.
 
-*Example:*
+See examples:
 
-```xml
-<executions>
-    <execution>
-        <id>mac</id>
-        <configuration>
-            <icon>icons/icons.icns</icon>
-        </configuration>
-    </execution>
-    <execution>
-        <id>win</id>
-        <configuration>
-            <icon>icons/icon.ico</icon>
-            <winMenu>true</winMenu>
-        </configuration>
-    </execution>
-</executions>
-```
-With above execution configuration the following command lines can be used:
+* [Configuration with executions](./examples/executions.html)
+* [Configuration with profiles](./examples/profiles.html)
 
-* for OS X package: ```mvn clean package jpackage:jpackage@mac```
+#### Mandatory Parameters
 
-* for Windows package: ```mvn clean package jpackage:jpackage@win```
+To enable various configuration approaches mandatory parameters are validated during plugin execution:
+
+* name
+* destination
 
 #### Relative Path Resolution
 
@@ -73,10 +60,10 @@ _Example:_
 
 ```xml
 <javaOptions>
-    <option>--enable-preview</option>
-    <option>-Dfile.encoding=UTF-8</option>
-    <options>--add-export</options>
-    <option>java.base/sun.security.util=ALL-UNNAMED</option>
+    <javaOption>--enable-preview</javaOption>
+    <javaOption>-Dfile.encoding=UTF-8</javaOption>
+    <javaOption>--add-export</javaOption>
+    <javaOption>java.base/sun.security.util=ALL-UNNAMED</javaOption>
 </javaOptions>
 ``` 
 

@@ -15,6 +15,8 @@
 
         <menu name="Examples">
             <item name="Image with full JRE" href="examples/full-jre.html"/>
+            <item name="Configuration with executions" href="examples/executions.html"/>
+            <item name="Configuration with profiles" href="examples/profiles.html"/>
         </menu>
 
         <menu name="Project">

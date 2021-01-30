@@ -7,17 +7,16 @@ package org.panteleyev.jpackage;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
@@ -47,8 +46,6 @@ public class JPackageMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
 
     /**
      * --verbose
@@ -84,7 +81,7 @@ public class JPackageMojo extends AbstractMojo {
      *
      * @since 0.0.1
      */
-    @Parameter(required = true)
+    @Parameter(defaultValue = "${project.name}")
     private String name;
 
     /**
@@ -109,7 +106,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.1
      */
     @Parameter
-    private String icon;
+    private File icon;
 
     /**
      * --runtime-image &lt;file path>
@@ -117,7 +114,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.1
      */
     @Parameter
-    private String runtimeImage;
+    private File runtimeImage;
 
     /**
      * --input &lt;input path>
@@ -125,7 +122,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.1
      */
     @Parameter
-    private String input;
+    private File input;
 
     /**
      * --install-dir &lt;file path>
@@ -133,7 +130,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.4
      */
     @Parameter
-    private String installDir;
+    private File installDir;
 
     /**
      * --resource-dir &lt;resource dir path>
@@ -141,15 +138,15 @@ public class JPackageMojo extends AbstractMojo {
      * @since 1.1.0
      */
     @Parameter
-    private String resourceDir;
+    private File resourceDir;
 
     /**
      * --dest &lt;destination path>
      *
      * @since 0.0.1
      */
-    @Parameter(required = true)
-    private String destination;
+    @Parameter
+    private File destination;
 
     /**
      * --module &lt;module name>[/&lt;main class>]
@@ -181,7 +178,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 1.1.0
      */
     @Parameter
-    private String temp;
+    private File temp;
 
     /**
      * --copyright &lt;copyright string>
@@ -203,9 +200,26 @@ public class JPackageMojo extends AbstractMojo {
      * --module-path &lt;module path>...
      *
      * @since 0.0.1
+     * @deprecated Use &lt;modulePaths>.
      */
     @Parameter
-    private String modulePath;
+    @Deprecated
+    private File modulePath;
+
+    /**
+     * <p>Each module path is specified by a separate &lt;modulePath> parameter.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;modulePaths>
+     *     &lt;modulePath>target/jmods&lt;/modulePath>
+     * &lt;/modulePaths>
+     * </pre>
+     * </p>
+     *
+     * @since 1.4.0
+     */
+    @Parameter
+    private List<File> modulePaths;
 
     /**
      * --java-options &lt;JVM option>
@@ -213,7 +227,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.1
      */
     @Parameter
-    private String[] javaOptions;
+    private List<String> javaOptions;
 
     /**
      * --arguments &lt;main class arguments>
@@ -221,7 +235,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.4
      */
     @Parameter
-    private String[] arguments;
+    private List<String> arguments;
 
     /**
      * --license-file &lt;license file path>
@@ -229,7 +243,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 1.3.0
      */
     @Parameter
-    private String licenseFile;
+    private File licenseFile;
 
     /**
      * <p>--file-associations &lt;file association property file></p>
@@ -247,7 +261,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 1.3.0
      */
     @Parameter
-    private String[] fileAssociations;
+    private List<File> fileAssociations;
 
     /**
      * <p>--add-launcher &lt;name>=&lt;file></p>
@@ -265,7 +279,15 @@ public class JPackageMojo extends AbstractMojo {
      * @since 1.3.0
      */
     @Parameter
-    private Launcher[] launchers;
+    private List<Launcher> launchers;
+
+    /**
+     * <p>--add-modules &lt;module>[,&lt;module>]</p>
+     *
+     * @since 1.4.0
+     */
+    @Parameter
+    private List<String> addModules;
 
     // Windows specific parameters
 
@@ -365,7 +387,7 @@ public class JPackageMojo extends AbstractMojo {
      * @since 0.0.2
      */
     @Parameter
-    private String macSigningKeychain;
+    private File macSigningKeychain;
 
     /**
      * --mac-signing-key-user-name &lt;team name>
@@ -433,7 +455,7 @@ public class JPackageMojo extends AbstractMojo {
     @Parameter
     private boolean linuxShortcut;
 
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
 
         Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
@@ -458,7 +480,7 @@ public class JPackageMojo extends AbstractMojo {
             try {
                 execute(parameters);
             } catch (Exception ex) {
-                throw new MojoExecutionException(ex.getMessage());
+                throw new MojoExecutionException(ex.getMessage(), ex);
             }
         }
     }
@@ -498,15 +520,23 @@ public class JPackageMojo extends AbstractMojo {
 
     private String getJPackageExecutable(Toolchain tc) {
         // Priority 1: JPACKAGE_HOME
-        String executable = getJPackageFromJdkHome(System.getenv(JPACKAGE_HOME_ENV));
-        if (executable != null) {
-            return executable;
+        String jpackageHome = System.getenv(JPACKAGE_HOME_ENV);
+        if (jpackageHome != null) {
+            getLog().warn(JPACKAGE_HOME_ENV + " is deprecated and will be removed");
+
+            String executable = getJPackageFromJdkHome(System.getenv(JPACKAGE_HOME_ENV));
+            if (executable != null) {
+                getLog().warn("Toolchain is ignored");
+                return executable;
+            }
         }
 
         // Priority 2: maven-toolchain-plugin
-        executable = getJPackageFromToolchain(tc);
-        if (executable != null) {
-            return executable;
+        if (tc != null) {
+            String executable = getJPackageFromToolchain(tc);
+            if (executable != null) {
+                return executable;
+            }
         }
 
         // Priority 3: java.home
@@ -540,28 +570,41 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
-    private void buildParameters(List<String> parameters) {
+    private void buildParameters(List<String> parameters) throws MojoFailureException {
         printLog(dryRun, "jpackage parameters:");
 
+        addMandatoryParameter(parameters, "--dest", destination);
         addParameter(parameters, "--verbose", verbose);
-        addParameter(parameters, "--type", type);
-        addParameter(parameters, "--name", name);
+        addParameter(parameters, type);
+        addMandatoryParameter(parameters, "--name", name);
         addParameter(parameters, "--app-version", appVersion);
-        addPathParameter(parameters, "--dest", destination);
         addParameter(parameters, "--copyright", copyright);
         addParameter(parameters, "--description", description);
-        addPathParameter(parameters, "--runtime-image", runtimeImage);
-        addPathParameter(parameters, "--input", input);
-        addPathParameter(parameters, "--install-dir", installDir);
-        addPathParameter(parameters, "--resource-dir", resourceDir);
+        addParameter(parameters, "--runtime-image", runtimeImage, true);
+        addParameter(parameters, "--input", input, true);
+        addParameter(parameters, "--install-dir", installDir);
+        addParameter(parameters, "--resource-dir", resourceDir, true);
         addParameter(parameters, "--vendor", vendor);
         addParameter(parameters, "--module", module);
         addParameter(parameters, "--main-class", mainClass);
         addParameter(parameters, "--main-jar", mainJar);
-        addPathParameter(parameters, "--temp", temp);
-        addPathParameter(parameters, "--module-path", modulePath);
-        addPathParameter(parameters, "--icon", icon);
-        addPathParameter(parameters, "--license-file", licenseFile);
+        addParameter(parameters, "--temp", temp);
+        if (modulePath != null) {
+            getLog().warn("Parameter modulePath is deprecated and will be removed");
+        }
+        addParameter(parameters, "--module-path", modulePath);
+        addParameter(parameters, "--icon", icon, true);
+        addParameter(parameters, "--license-file", licenseFile, true);
+
+        if (modulePaths != null) {
+            for (File modulePath : modulePaths) {
+                addParameter(parameters, "--module-path", modulePath, true);
+            }
+        }
+
+        if (addModules != null && !addModules.isEmpty()) {
+            addParameter(parameters, "--add-modules", String.join(",", addModules));
+        }
 
         if (javaOptions != null) {
             for (String option : javaOptions) {
@@ -576,15 +619,16 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (fileAssociations != null) {
-            for (String association : fileAssociations) {
-                addPathParameter(parameters, "--file-associations", association);
+            for (File association : fileAssociations) {
+                addParameter(parameters, "--file-associations", association, true);
             }
         }
 
         if (launchers != null) {
             for (Launcher launcher : launchers) {
+                launcher.validate();
                 addParameter(parameters, "--add-launcher",
-                    launcher.getName() + "=" + resolvePath(launcher.getFile()));
+                    launcher.getName() + "=" + launcher.getFile().getAbsolutePath());
             }
         }
 
@@ -593,7 +637,7 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(parameters, "--mac-package-name", macPackageName);
             addParameter(parameters, "--mac-package-signing-prefix", macPackageSigningPrefix);
             addParameter(parameters, "--mac-sign", macSign);
-            addParameter(parameters, "--mac-signing-keychain", macSigningKeychain);
+            addParameter(parameters, "--mac-signing-keychain", macSigningKeychain, true);
             addParameter(parameters, "--mac-signing-key-user-name", macSigningKeyUserName);
         } else if (isWindows()) {
             addParameter(parameters, "--win-menu", winMenu);
@@ -614,6 +658,26 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
+    private void addMandatoryParameter(List<String> params,
+                                       @SuppressWarnings("SameParameterValue") String name,
+                                       String value) throws MojoFailureException
+    {
+        if (value == null || value.isEmpty()) {
+            throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
+        }
+        addParameter(params, name, value);
+    }
+
+    private void addMandatoryParameter(List<String> params,
+                                       @SuppressWarnings("SameParameterValue") String name,
+                                       File value) throws MojoFailureException
+    {
+        if (value == null) {
+            throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
+        }
+        addParameter(params, name, value);
+    }
+
     private void addParameter(List<String> params, String name, String value) {
         if (value == null || value.isEmpty()) {
             return;
@@ -624,26 +688,20 @@ public class JPackageMojo extends AbstractMojo {
         params.add(value);
     }
 
-    private void addPathParameter(List<String> params, String name, String value) {
-        if (value == null || value.isEmpty()) {
+    private void addParameter(List<String> params, String name, File value) throws MojoFailureException {
+        addParameter(params, name, value, false);
+    }
+
+    private void addParameter(List<String> params, String name, File value, boolean checkExistence) throws MojoFailureException {
+        if (value == null) {
             return;
         }
 
-        addParameter(params, name, resolvePath(value));
-    }
-
-    private String resolvePath(String value) {
-        if (value == null || value.isEmpty()) {
-            return "";
+        if (checkExistence && !value.exists()) {
+            throw new MojoFailureException("File or directory " + value.getAbsolutePath() + " does not exist");
         }
 
-        Path path = new File(value).toPath();
-        if (!path.isAbsolute()) {
-            String oldValue = value;
-            value = project.getBasedir().getAbsolutePath() + File.separator + value;
-            getLog().debug("Resolving path " + oldValue + " to " + value);
-        }
-        return value;
+        addParameter(params, name, value.getAbsolutePath());
     }
 
     private void addParameter(List<String> params, String name, boolean value) {
@@ -655,11 +713,11 @@ public class JPackageMojo extends AbstractMojo {
         params.add(name);
     }
 
-    private void addParameter(List<String> params, String name, EnumParameter value) {
+    private void addParameter(List<String> params, EnumParameter value) {
         if (value == null) {
             return;
         }
 
-        addParameter(params, name, value.getValue());
+        addParameter(params, value.getParameterName(), value.getValue());
     }
 }

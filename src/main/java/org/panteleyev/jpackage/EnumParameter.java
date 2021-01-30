@@ -5,5 +5,6 @@
 package org.panteleyev.jpackage;
 
 interface EnumParameter {
+    String getParameterName();
     String getValue();
 }

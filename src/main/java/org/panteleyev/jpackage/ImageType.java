@@ -20,6 +20,11 @@ public enum ImageType implements EnumParameter {
     }
 
     @Override
+    public String getParameterName() {
+        return "--type";
+    }
+
+    @Override
     public String getValue() {
         return value;
     }
