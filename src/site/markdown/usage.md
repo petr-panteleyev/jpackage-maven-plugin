@@ -6,13 +6,10 @@ For detailed information about ```jpackage``` please refer to [Packaging Tool Us
 
 Plugin searches for ```jpackage``` executable using the following priority list:
 
-1. Environment variable ```JPACKAGE_HOME```. If specific version of jpackage is required then this variable must point
-to the corresponding JDK same way as ```JAVA_HOME```.
-
-2. ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
+1. ```maven-toolchains-plugin``` configured in the project. Toolchain "jdk" will be queried for 
 tool = "jpackage".
 
-3. ```java.home``` system property.
+2. ```java.home``` system property.
 
 ### Configuration
 
@@ -45,6 +42,7 @@ The following plugin parameters define directory or file location:
 * resourceDir 
 * modulePath
 * runtimeImage
+* appImage  
 * temp
 * licenseFile
 * launcher.file
@@ -82,7 +80,7 @@ _Example:_
 </arguments>
 ```
 
-#### Additional Launcher
+#### Additional Launchers
 
 Additional launchers provide the opportunity to install alternative ways to start an application.
 
@@ -116,6 +114,19 @@ _Example:_
 ```
 
 Note: apparently this option does not work for modular applications.
+
+#### Additional JPackage Options
+
+Additional options allow passing jpackage command line options not supported by the plugin. These options are passed as is without any transformation.
+
+_Example:_
+
+```xml
+<additionalOptions>
+    <option>--jlink-options</option>
+    <option>--bind-services</option>
+</additionalOptions>
+```
 
 ### Assembling Dependencies
 
@@ -160,7 +171,7 @@ application jar. This example shows how to do this via ```maven-dependency-plugi
 </plugins>
 ```
 
-### Dry Run Mode
+## Dry Run Mode
 
 To print jpackage parameters without executing jpackage set ```jpackage.dryRun``` property to ```true```.
 

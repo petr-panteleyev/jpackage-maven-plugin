@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
 import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
@@ -34,12 +35,10 @@ import static org.panteleyev.jpackage.StringUtil.escape;
 public class JPackageMojo extends AbstractMojo {
     public static final String GOAL = "jpackage";
 
-    private static final String JPACKAGE_HOME_ENV = "JPACKAGE_HOME";
     private static final String TOOLCHAIN = "jdk";
     private static final String EXECUTABLE = "jpackage";
 
     private static final String DRY_RUN_PROPERTY = "jpackage.dryRun";
-    private boolean dryRun;
 
     @Component
     private ToolchainManager toolchainManager;
@@ -197,16 +196,6 @@ public class JPackageMojo extends AbstractMojo {
     private String description;
 
     /**
-     * --module-path &lt;module path>...
-     *
-     * @since 0.0.1
-     * @deprecated Use &lt;modulePaths>.
-     */
-    @Parameter
-    @Deprecated
-    private File modulePath;
-
-    /**
      * <p>Each module path is specified by a separate &lt;modulePath> parameter.</p>
      * <p>Example:
      * <pre>
@@ -288,6 +277,31 @@ public class JPackageMojo extends AbstractMojo {
      */
     @Parameter
     private List<String> addModules;
+
+    /**
+     * <p>--app-image &lt;path to application image></p>
+     *
+     * @since 1.5.0
+     */
+    @Parameter
+    private File appImage;
+
+    /**
+     * <p>Additional jpackage options not covered by dedicated plugin parameters.</p>
+     *
+     * <p>Example:
+     * <pre>
+     * &lt;additionalOptions>
+     *     &lt;option>--jlink-options&lt;/option>
+     *     &lt;option>--bind-services&lt;/option>
+     * &lt;/additionalOptions>
+     * </pre>
+     * </p>
+     *
+     * @since 1.5.0
+     */
+    @Parameter
+    private List<String> additionalOptions;
 
     // Windows specific parameters
 
@@ -456,24 +470,21 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
 
         Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (tc != null) {
             getLog().info("Toolchain in jpackage-maven-plugin: " + tc);
         }
 
-        String executable = getJPackageExecutable(tc);
-        if (executable == null) {
-            throw new MojoExecutionException("Failed to find " + EXECUTABLE);
-        }
-
-        getLog().debug("Using: " + executable);
+        String executable = getJPackageExecutable(tc)
+            .orElseThrow(() -> new MojoExecutionException("Failed to find " + EXECUTABLE));
+        getLog().info("Using: " + executable);
 
         List<String> parameters = new ArrayList<>();
         parameters.add(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
         buildParameters(parameters);
 
+        boolean dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
         if (dryRun) {
             getLog().warn("Dry-run mode, not executing " + EXECUTABLE);
         } else {
@@ -485,9 +496,9 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
-    private String getJPackageFromJdkHome(String jdkHome) {
+    private Optional<String> getJPackageFromJdkHome(String jdkHome) {
         if (jdkHome == null || jdkHome.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         getLog().debug("Looking for " + EXECUTABLE + " in " + jdkHome);
@@ -498,16 +509,16 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (new File(executable).exists()) {
-            return executable;
+            return Optional.of(executable);
         } else {
             getLog().warn("File " + executable + " does not exist");
-            return null;
+            return Optional.empty();
         }
     }
 
-    private String getJPackageFromToolchain(Toolchain tc) {
+    private Optional<String> getJPackageFromToolchain(Toolchain tc) {
         if (tc == null) {
-            return null;
+            return Optional.empty();
         }
 
         String executable = tc.findTool(EXECUTABLE);
@@ -515,32 +526,13 @@ public class JPackageMojo extends AbstractMojo {
             getLog().warn(EXECUTABLE + " is not part of configured toolchain");
         }
 
-        return executable;
+        return Optional.ofNullable(executable);
     }
 
-    private String getJPackageExecutable(Toolchain tc) {
-        // Priority 1: JPACKAGE_HOME
-        String jpackageHome = System.getenv(JPACKAGE_HOME_ENV);
-        if (jpackageHome != null) {
-            getLog().warn(JPACKAGE_HOME_ENV + " is deprecated and will be removed");
-
-            String executable = getJPackageFromJdkHome(System.getenv(JPACKAGE_HOME_ENV));
-            if (executable != null) {
-                getLog().warn("Toolchain is ignored");
-                return executable;
-            }
-        }
-
-        // Priority 2: maven-toolchain-plugin
-        if (tc != null) {
-            String executable = getJPackageFromToolchain(tc);
-            if (executable != null) {
-                return executable;
-            }
-        }
-
-        // Priority 3: java.home
-        return getJPackageFromJdkHome(System.getProperty("java.home"));
+    private Optional<String> getJPackageExecutable(Toolchain tc) {
+        Optional<String> executable = getJPackageFromToolchain(tc);
+        return executable.isPresent() ?
+            executable : getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
     private void execute(List<String> parameters) throws Exception {
@@ -562,21 +554,13 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
-    private void printLog(boolean info, String text) {
-        if (info) {
-            getLog().info(text);
-        } else {
-            getLog().debug(text);
-        }
-    }
-
     private void buildParameters(List<String> parameters) throws MojoFailureException {
-        printLog(dryRun, "jpackage parameters:");
+        getLog().info("jpackage options:");
 
+        addMandatoryParameter(parameters, "--name", name);
         addMandatoryParameter(parameters, "--dest", destination);
         addParameter(parameters, "--verbose", verbose);
         addParameter(parameters, type);
-        addMandatoryParameter(parameters, "--name", name);
         addParameter(parameters, "--app-version", appVersion);
         addParameter(parameters, "--copyright", copyright);
         addParameter(parameters, "--description", description);
@@ -589,12 +573,9 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(parameters, "--main-class", mainClass);
         addParameter(parameters, "--main-jar", mainJar);
         addParameter(parameters, "--temp", temp);
-        if (modulePath != null) {
-            getLog().warn("Parameter modulePath is deprecated and will be removed");
-        }
-        addParameter(parameters, "--module-path", modulePath);
         addParameter(parameters, "--icon", icon, true);
         addParameter(parameters, "--license-file", licenseFile, true);
+        addParameter(parameters, "--app-image", appImage, true);
 
         if (modulePaths != null) {
             for (File modulePath : modulePaths) {
@@ -629,6 +610,12 @@ public class JPackageMojo extends AbstractMojo {
                 launcher.validate();
                 addParameter(parameters, "--add-launcher",
                     launcher.getName() + "=" + launcher.getFile().getAbsolutePath());
+            }
+        }
+
+        if (additionalOptions != null) {
+            for (String option : additionalOptions) {
+                addParameter(parameters, option);
             }
         }
 
@@ -683,7 +670,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        printLog(dryRun, "  " + name + " " + value);
+        getLog().info("  " + name + " " + value);
         params.add(name);
         params.add(value);
     }
@@ -704,12 +691,21 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(params, name, value.getAbsolutePath());
     }
 
+    private void addParameter(List<String> params, String name) {
+        if (name == null || name.isEmpty()) {
+            return;
+        }
+
+        getLog().info("  " + name);
+        params.add(name);
+    }
+
     private void addParameter(List<String> params, String name, boolean value) {
         if (!value) {
             return;
         }
 
-        printLog(dryRun, "  " + name);
+        getLog().info("  " + name);
         params.add(name);
     }
 

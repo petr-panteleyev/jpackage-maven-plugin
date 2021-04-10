@@ -4,8 +4,8 @@
  */
 package org.panteleyev.jpackage;
 
-public interface OsUtil {
-    String OS = System.getProperty("os.name").toLowerCase();
+abstract class OsUtil {
+    private static final String OS = System.getProperty("os.name").toLowerCase();
 
     static boolean isWindows() {
         return OS.contains("win");

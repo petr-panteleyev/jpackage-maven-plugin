@@ -8,4 +8,4 @@ Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available si
 
 [Plugin Documentation](https://petr-panteleyev.github.io/jpackage-maven-plugin/)
 
-[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf)
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/16/jpackage/packaging-tool-user-guide.pdf)

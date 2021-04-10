@@ -7,7 +7,7 @@ package org.panteleyev.jpackage;
 import java.util.regex.Matcher;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
 
-public class StringUtil {
+class StringUtil {
     private static final String REPLACER = Matcher.quoteReplacement(isWindows() ? "\\\\\\\"" : "\\\"");
     private static final String SPACE_WRAPPER = isWindows() ? "\\\"" : "\"";
 
