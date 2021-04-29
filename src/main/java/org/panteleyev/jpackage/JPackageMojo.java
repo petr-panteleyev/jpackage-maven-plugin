@@ -12,18 +12,20 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.shared.utils.cli.CommandLineException;
+import org.apache.maven.shared.utils.cli.CommandLineUtils;
+import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
 import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
 import static org.panteleyev.jpackage.StringUtil.escape;
+import static org.panteleyev.jpackage.StringUtil.isEmpty;
+import static org.panteleyev.jpackage.StringUtil.isNotEmpty;
 
 /**
  * <p>Generates application package.</p>
@@ -470,7 +472,6 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-
         Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (tc != null) {
             getLog().info("Toolchain in jpackage-maven-plugin: " + tc);
@@ -480,16 +481,15 @@ public class JPackageMojo extends AbstractMojo {
             .orElseThrow(() -> new MojoExecutionException("Failed to find " + EXECUTABLE));
         getLog().info("Using: " + executable);
 
-        List<String> parameters = new ArrayList<>();
-        parameters.add(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
-        buildParameters(parameters);
+        Commandline commandLine = buildParameters();
+        commandLine.setExecutable(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
 
         boolean dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
         if (dryRun) {
             getLog().warn("Dry-run mode, not executing " + EXECUTABLE);
         } else {
             try {
-                execute(parameters);
+                execute(commandLine);
             } catch (Exception ex) {
                 throw new MojoExecutionException(ex.getMessage(), ex);
             }
@@ -535,151 +535,173 @@ public class JPackageMojo extends AbstractMojo {
             executable : getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
-    private void execute(List<String> parameters) throws Exception {
-        Process process = new ProcessBuilder()
-            .redirectErrorStream(true)
-            .command(parameters)
-            .start();
+    private void execute(Commandline commandline) throws Exception {
+        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
+        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                getLog().info(line);
+        try {
+            int exitCode = CommandLineUtils.executeCommandLine(commandline, out, err);
+
+            String output = (isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim());
+
+            if (exitCode != 0) {
+                if (isNotEmpty(output)) {
+                    for (String line : output.split("\n")) {
+                        getLog().error(line);
+                    }
+                }
+
+                StringBuilder msg = new StringBuilder("\nExit code: ")
+                    .append(exitCode);
+                String errOutput = err.getOutput();
+                if (isNotEmpty(errOutput)) {
+                    msg.append(" - ").append(errOutput);
+                }
+                msg.append('\n');
+                msg.append("Command line was: ").append(commandline).append('\n').append('\n');
+
+                throw new MojoExecutionException(msg.toString());
+            } else {
+                if (isNotEmpty(output)) {
+                    for (String outputLine : output.split("\n")) {
+                        getLog().info(outputLine);
+                    }
+                }
             }
-        }
-
-        int status = process.waitFor();
-        if (status != 0) {
-            throw new MojoExecutionException("Error while executing " + EXECUTABLE);
+        } catch (CommandLineException e) {
+            throw new MojoExecutionException("Error while executing " + EXECUTABLE + ": " + e.getMessage(), e);
         }
     }
 
-    private void buildParameters(List<String> parameters) throws MojoFailureException {
+    private Commandline buildParameters() throws MojoFailureException {
         getLog().info("jpackage options:");
 
-        addMandatoryParameter(parameters, "--name", name);
-        addMandatoryParameter(parameters, "--dest", destination);
-        addParameter(parameters, "--verbose", verbose);
-        addParameter(parameters, type);
-        addParameter(parameters, "--app-version", appVersion);
-        addParameter(parameters, "--copyright", copyright);
-        addParameter(parameters, "--description", description);
-        addParameter(parameters, "--runtime-image", runtimeImage, true);
-        addParameter(parameters, "--input", input, true);
-        addParameter(parameters, "--install-dir", installDir);
-        addParameter(parameters, "--resource-dir", resourceDir, true);
-        addParameter(parameters, "--vendor", vendor);
-        addParameter(parameters, "--module", module);
-        addParameter(parameters, "--main-class", mainClass);
-        addParameter(parameters, "--main-jar", mainJar);
-        addParameter(parameters, "--temp", temp);
-        addParameter(parameters, "--icon", icon, true);
-        addParameter(parameters, "--license-file", licenseFile, true);
-        addParameter(parameters, "--app-image", appImage, true);
+        Commandline commandline = new Commandline();
+        addMandatoryParameter(commandline, "--name", name);
+        addMandatoryParameter(commandline, "--dest", destination);
+        addParameter(commandline, "--verbose", verbose);
+        addParameter(commandline, type);
+        addParameter(commandline, "--app-version", appVersion);
+        addParameter(commandline, "--copyright", copyright);
+        addParameter(commandline, "--description", description);
+        addParameter(commandline, "--runtime-image", runtimeImage, true);
+        addParameter(commandline, "--input", input, true);
+        addParameter(commandline, "--install-dir", installDir);
+        addParameter(commandline, "--resource-dir", resourceDir, true);
+        addParameter(commandline, "--vendor", vendor);
+        addParameter(commandline, "--module", module);
+        addParameter(commandline, "--main-class", mainClass);
+        addParameter(commandline, "--main-jar", mainJar);
+        addParameter(commandline, "--temp", temp);
+        addParameter(commandline, "--icon", icon, true);
+        addParameter(commandline, "--license-file", licenseFile, true);
+        addParameter(commandline, "--app-image", appImage, true);
 
         if (modulePaths != null) {
             for (File modulePath : modulePaths) {
-                addParameter(parameters, "--module-path", modulePath, true);
+                addParameter(commandline, "--module-path", modulePath, true);
             }
         }
 
         if (addModules != null && !addModules.isEmpty()) {
-            addParameter(parameters, "--add-modules", String.join(",", addModules));
+            addParameter(commandline, "--add-modules", String.join(",", addModules));
         }
 
         if (javaOptions != null) {
             for (String option : javaOptions) {
-                addParameter(parameters, "--java-options", escape(option));
+                addParameter(commandline, "--java-options", escape(option));
             }
         }
 
         if (arguments != null) {
             for (String arg : arguments) {
-                addParameter(parameters, "--arguments", escape(arg));
+                addParameter(commandline, "--arguments", escape(arg));
             }
         }
 
         if (fileAssociations != null) {
             for (File association : fileAssociations) {
-                addParameter(parameters, "--file-associations", association, true);
+                addParameter(commandline, "--file-associations", association, true);
             }
         }
 
         if (launchers != null) {
             for (Launcher launcher : launchers) {
                 launcher.validate();
-                addParameter(parameters, "--add-launcher",
+                addParameter(commandline, "--add-launcher",
                     launcher.getName() + "=" + launcher.getFile().getAbsolutePath());
             }
         }
 
         if (additionalOptions != null) {
             for (String option : additionalOptions) {
-                addParameter(parameters, option);
+                addParameter(commandline, option);
             }
         }
 
         if (isMac()) {
-            addParameter(parameters, "--mac-package-identifier", macPackageIdentifier);
-            addParameter(parameters, "--mac-package-name", macPackageName);
-            addParameter(parameters, "--mac-package-signing-prefix", macPackageSigningPrefix);
-            addParameter(parameters, "--mac-sign", macSign);
-            addParameter(parameters, "--mac-signing-keychain", macSigningKeychain, true);
-            addParameter(parameters, "--mac-signing-key-user-name", macSigningKeyUserName);
+            addParameter(commandline, "--mac-package-identifier", macPackageIdentifier);
+            addParameter(commandline, "--mac-package-name", macPackageName);
+            addParameter(commandline, "--mac-package-signing-prefix", macPackageSigningPrefix);
+            addParameter(commandline, "--mac-sign", macSign);
+            addParameter(commandline, "--mac-signing-keychain", macSigningKeychain, true);
+            addParameter(commandline, "--mac-signing-key-user-name", macSigningKeyUserName);
         } else if (isWindows()) {
-            addParameter(parameters, "--win-menu", winMenu);
-            addParameter(parameters, "--win-dir-chooser", winDirChooser);
-            addParameter(parameters, "--win-upgrade-uuid", winUpgradeUuid);
-            addParameter(parameters, "--win-menu-group", winMenuGroup);
-            addParameter(parameters, "--win-shortcut", winShortcut);
-            addParameter(parameters, "--win-per-user-install", winPerUserInstall);
-            addParameter(parameters, "--win-console", winConsole);
+            addParameter(commandline, "--win-menu", winMenu);
+            addParameter(commandline, "--win-dir-chooser", winDirChooser);
+            addParameter(commandline, "--win-upgrade-uuid", winUpgradeUuid);
+            addParameter(commandline, "--win-menu-group", winMenuGroup);
+            addParameter(commandline, "--win-shortcut", winShortcut);
+            addParameter(commandline, "--win-per-user-install", winPerUserInstall);
+            addParameter(commandline, "--win-console", winConsole);
         } else if (isLinux()) {
-            addParameter(parameters, "--linux-package-name", linuxPackageName);
-            addParameter(parameters, "--linux-deb-maintainer", linuxDebMaintainer);
-            addParameter(parameters, "--linux-menu-group", linuxMenuGroup);
-            addParameter(parameters, "--linux-rpm-license-type", linuxRpmLicenseType);
-            addParameter(parameters, "--linux-app-release", linuxAppRelease);
-            addParameter(parameters, "--linux-app-category", linuxAppCategory);
-            addParameter(parameters, "--linux-shortcut", linuxShortcut);
+            addParameter(commandline, "--linux-package-name", linuxPackageName);
+            addParameter(commandline, "--linux-deb-maintainer", linuxDebMaintainer);
+            addParameter(commandline, "--linux-menu-group", linuxMenuGroup);
+            addParameter(commandline, "--linux-rpm-license-type", linuxRpmLicenseType);
+            addParameter(commandline, "--linux-app-release", linuxAppRelease);
+            addParameter(commandline, "--linux-app-category", linuxAppCategory);
+            addParameter(commandline, "--linux-shortcut", linuxShortcut);
         }
+
+        return commandline;
     }
 
-    private void addMandatoryParameter(List<String> params,
+    private void addMandatoryParameter(Commandline commandline,
                                        @SuppressWarnings("SameParameterValue") String name,
                                        String value) throws MojoFailureException
     {
         if (value == null || value.isEmpty()) {
             throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
         }
-        addParameter(params, name, value);
+        addParameter(commandline, name, value);
     }
 
-    private void addMandatoryParameter(List<String> params,
+    private void addMandatoryParameter(Commandline commandline,
                                        @SuppressWarnings("SameParameterValue") String name,
                                        File value) throws MojoFailureException
     {
         if (value == null) {
             throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
         }
-        addParameter(params, name, value);
+        addParameter(commandline, name, value);
     }
 
-    private void addParameter(List<String> params, String name, String value) {
+    private void addParameter(Commandline commandline, String name, String value) {
         if (value == null || value.isEmpty()) {
             return;
         }
 
         getLog().info("  " + name + " " + value);
-        params.add(name);
-        params.add(value);
+        commandline.createArg().setValue(name);
+        commandline.createArg().setValue(value);
     }
 
-    private void addParameter(List<String> params, String name, File value) throws MojoFailureException {
-        addParameter(params, name, value, false);
+    private void addParameter(Commandline commandline, String name, File value) throws MojoFailureException {
+        addParameter(commandline, name, value, false);
     }
 
-    private void addParameter(List<String> params, String name, File value, boolean checkExistence) throws MojoFailureException {
+    private void addParameter(Commandline commandline, String name, File value, boolean checkExistence) throws MojoFailureException {
         if (value == null) {
             return;
         }
@@ -688,32 +710,32 @@ public class JPackageMojo extends AbstractMojo {
             throw new MojoFailureException("File or directory " + value.getAbsolutePath() + " does not exist");
         }
 
-        addParameter(params, name, value.getAbsolutePath());
+        addParameter(commandline, name, value.getAbsolutePath());
     }
 
-    private void addParameter(List<String> params, String name) {
+    private void addParameter(Commandline commandline, String name) {
         if (name == null || name.isEmpty()) {
             return;
         }
 
         getLog().info("  " + name);
-        params.add(name);
+        commandline.createArg().setValue(name);
     }
 
-    private void addParameter(List<String> params, String name, boolean value) {
+    private void addParameter(Commandline commandline, String name, boolean value) {
         if (!value) {
             return;
         }
 
         getLog().info("  " + name);
-        params.add(name);
+        commandline.createArg().setValue(name);
     }
 
-    private void addParameter(List<String> params, EnumParameter value) {
+    private void addParameter(Commandline commandline, EnumParameter value) {
         if (value == null) {
             return;
         }
 
-        addParameter(params, value.getParameterName(), value.getValue());
+        addParameter(commandline, value.getParameterName(), value.getValue());
     }
 }

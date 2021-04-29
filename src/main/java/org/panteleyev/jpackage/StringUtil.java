@@ -19,4 +19,12 @@ class StringUtil {
 
         return arg;
     }
+
+    static boolean isNotEmpty(String s) {
+        return s != null && s.trim().length() > 0;
+    }
+
+    static boolean isEmpty(String s) {
+        return s == null || s.trim().length() == 0;
+    }
 }
