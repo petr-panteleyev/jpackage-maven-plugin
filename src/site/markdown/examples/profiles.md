@@ -58,7 +58,9 @@
                     <appVersion>${project.version}</appVersion>
                     <vendor>app.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
-                    <modulePath>target/mods</modulePath>
+                    <modulePaths>
+                        <modulePath>target/mods</modulePath>
+                    </modulePaths>
                     <destination>target/dist</destination>
                     <javaOptions>
                         <option>--enable-preview</option>

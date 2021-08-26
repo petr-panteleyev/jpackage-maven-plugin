@@ -12,7 +12,9 @@
         <vendor>app.org</vendor>
         <runtimeImage>${java.home}</runtimeImage>
         <module>${appModule}/${appMainClass}</module>
-        <modulePath>target/mods</modulePath>
+        <modulePaths>
+            <modulePath>target/mods</modulePath>
+        </modulePaths>
         <destination>target/dist</destination>
         <javaOptions>
             <option>--enable-preview</option>

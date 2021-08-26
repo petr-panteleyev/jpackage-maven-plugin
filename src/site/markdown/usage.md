@@ -165,7 +165,9 @@ application jar. This example shows how to do this via ```maven-dependency-plugi
         <groupId>org.panteleyev</groupId>
         <artifactId>jpackage-maven-plugin</artifactId>
         <configuration>
-            <modulePath>target/jmods</modulePath>
+            <modulePaths>
+                <modulePath>target/jmods</modulePath>
+            </modulePaths>
         </configuration>
     </plugin>
 </plugins>
