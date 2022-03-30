@@ -49,6 +49,14 @@ public class JPackageMojo extends AbstractMojo {
     private MavenSession session;
 
     /**
+     * Skips plugin execution.
+     *
+     * @since 1.5.2
+     */
+    @Parameter(defaultValue = "false")
+    private boolean skip;
+
+    /**
      * --verbose
      *
      * @since 0.0.4
@@ -472,6 +480,11 @@ public class JPackageMojo extends AbstractMojo {
     private boolean linuxShortcut;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Skipping plugin execution");
+            return;
+        }
+
         Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (tc != null) {
             getLog().info("Toolchain in jpackage-maven-plugin: " + tc);
