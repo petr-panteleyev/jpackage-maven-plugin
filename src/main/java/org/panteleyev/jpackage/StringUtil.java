@@ -1,13 +1,16 @@
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
 
 import java.util.regex.Matcher;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
 
-class StringUtil {
+final class StringUtil {
+    private StringUtil() {
+    }
+
     private static final String REPLACER = Matcher.quoteReplacement(isWindows() ? "\\\\\\\"" : "\\\"");
     private static final String SPACE_WRAPPER = isWindows() ? "\\\"" : "\"";
 

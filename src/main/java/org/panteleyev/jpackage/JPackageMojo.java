@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
 
@@ -17,9 +17,70 @@ import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
+
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+
+import static org.panteleyev.jpackage.CommandLineParameter.ABOUT_URL;
+import static org.panteleyev.jpackage.CommandLineParameter.ADD_LAUNCHER;
+import static org.panteleyev.jpackage.CommandLineParameter.ADD_MODULES;
+import static org.panteleyev.jpackage.CommandLineParameter.APP_CONTENT;
+import static org.panteleyev.jpackage.CommandLineParameter.APP_IMAGE;
+import static org.panteleyev.jpackage.CommandLineParameter.APP_VERSION;
+import static org.panteleyev.jpackage.CommandLineParameter.ARGUMENTS;
+import static org.panteleyev.jpackage.CommandLineParameter.BIND_SERVICES;
+import static org.panteleyev.jpackage.CommandLineParameter.COPYRIGHT;
+import static org.panteleyev.jpackage.CommandLineParameter.DESCRIPTION;
+import static org.panteleyev.jpackage.CommandLineParameter.DESTINATION;
+import static org.panteleyev.jpackage.CommandLineParameter.FILE_ASSOCIATIONS;
+import static org.panteleyev.jpackage.CommandLineParameter.ICON;
+import static org.panteleyev.jpackage.CommandLineParameter.INPUT;
+import static org.panteleyev.jpackage.CommandLineParameter.INSTALL_DIR;
+import static org.panteleyev.jpackage.CommandLineParameter.JAVA_OPTIONS;
+import static org.panteleyev.jpackage.CommandLineParameter.JLINK_OPTIONS;
+import static org.panteleyev.jpackage.CommandLineParameter.LAUNCHER_AS_SERVICE;
+import static org.panteleyev.jpackage.CommandLineParameter.LICENSE_FILE;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_APP_CATEGORY;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_APP_RELEASE;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_DEB_MAINTAINER;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_MENU_GROUP;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_PACKAGE_DEPS;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_PACKAGE_NAME;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_RPM_LICENSE_TYPE;
+import static org.panteleyev.jpackage.CommandLineParameter.LINUX_SHORTCUT;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_APP_CATEGORY;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_APP_STORE;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_BUNDLE_SIGNING_PREFIX;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_DMG_CONTENT;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_ENTITLEMENTS;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_PACKAGE_IDENTIFIER;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_PACKAGE_NAME;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_PACKAGE_SIGNING_PREFIX;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_SIGN;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_SIGNING_KEYCHAIN;
+import static org.panteleyev.jpackage.CommandLineParameter.MAC_SIGNING_KEY_USER_NAME;
+import static org.panteleyev.jpackage.CommandLineParameter.MAIN_CLASS;
+import static org.panteleyev.jpackage.CommandLineParameter.MAIN_JAR;
+import static org.panteleyev.jpackage.CommandLineParameter.MODULE;
+import static org.panteleyev.jpackage.CommandLineParameter.MODULE_PATH;
+import static org.panteleyev.jpackage.CommandLineParameter.NAME;
+import static org.panteleyev.jpackage.CommandLineParameter.RESOURCE_DIR;
+import static org.panteleyev.jpackage.CommandLineParameter.RUNTIME_IMAGE;
+import static org.panteleyev.jpackage.CommandLineParameter.TEMP;
+import static org.panteleyev.jpackage.CommandLineParameter.TYPE;
+import static org.panteleyev.jpackage.CommandLineParameter.VENDOR;
+import static org.panteleyev.jpackage.CommandLineParameter.VERBOSE;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_CONSOLE;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_DIR_CHOOSER;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_HELP_URL;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_MENU;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_MENU_GROUP;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_PER_USER_INSTALL;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_SHORTCUT;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_SHORTCUT_PROMPT;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_UPDATE_URL;
+import static org.panteleyev.jpackage.CommandLineParameter.WIN_UPGRADE_UUID;
 import static org.panteleyev.jpackage.OsUtil.isLinux;
 import static org.panteleyev.jpackage.OsUtil.isMac;
 import static org.panteleyev.jpackage.OsUtil.isWindows;
@@ -38,7 +99,7 @@ public class JPackageMojo extends AbstractMojo {
     public static final String GOAL = "jpackage";
 
     private static final String TOOLCHAIN = "jdk";
-    private static final String EXECUTABLE = "jpackage";
+    public static final String EXECUTABLE = "jpackage";
 
     private static final String DRY_RUN_PROPERTY = "jpackage.dryRun";
 
@@ -50,8 +111,6 @@ public class JPackageMojo extends AbstractMojo {
 
     /**
      * Skips plugin execution.
-     *
-     * @since 1.5.2
      */
     @Parameter(defaultValue = "false")
     private boolean skip;
@@ -59,7 +118,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --verbose
      *
-     * @since 0.0.4
+     * @since 14
      */
     @Parameter
     private boolean verbose;
@@ -80,7 +139,7 @@ public class JPackageMojo extends AbstractMojo {
      *     <tr><td>DEB</td><td>deb</td></tr>
      * </table>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private ImageType type;
@@ -88,7 +147,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --name &lt;name>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter(defaultValue = "${project.name}")
     private String name;
@@ -96,7 +155,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --app-version &lt;version>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter(defaultValue = "${project.version}")
     private String appVersion;
@@ -104,7 +163,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --vendor &lt;vendor string>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String vendor;
@@ -112,7 +171,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --icon &lt;icon file path>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private File icon;
@@ -120,7 +179,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --runtime-image &lt;file path>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private File runtimeImage;
@@ -128,7 +187,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --input &lt;input path>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private File input;
@@ -136,7 +195,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --install-dir &lt;file path>
      *
-     * @since 0.0.4
+     * @since 14
      */
     @Parameter
     private File installDir;
@@ -144,7 +203,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --resource-dir &lt;resource dir path>
      *
-     * @since 1.1.0
+     * @since 14
      */
     @Parameter
     private File resourceDir;
@@ -152,7 +211,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --dest &lt;destination path>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private File destination;
@@ -160,7 +219,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --module &lt;module name>[/&lt;main class>]
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String module;
@@ -168,7 +227,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --main-class &lt;class name>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String mainClass;
@@ -176,7 +235,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --main-jar &lt;main jar file>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String mainJar;
@@ -184,7 +243,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --temp &lt;temp dir path>
      *
-     * @since 1.1.0
+     * @since 14
      */
     @Parameter
     private File temp;
@@ -192,7 +251,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --copyright &lt;copyright string>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String copyright;
@@ -200,7 +259,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --description &lt;description string>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String description;
@@ -215,7 +274,7 @@ public class JPackageMojo extends AbstractMojo {
      * </pre>
      * </p>
      *
-     * @since 1.4.0
+     * @since 14
      */
     @Parameter
     private List<File> modulePaths;
@@ -223,7 +282,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --java-options &lt;JVM option>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private List<String> javaOptions;
@@ -231,7 +290,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --arguments &lt;main class arguments>
      *
-     * @since 0.0.4
+     * @since 14
      */
     @Parameter
     private List<String> arguments;
@@ -239,7 +298,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --license-file &lt;license file path>
      *
-     * @since 1.3.0
+     * @since 14
      */
     @Parameter
     private File licenseFile;
@@ -257,7 +316,7 @@ public class JPackageMojo extends AbstractMojo {
      * </pre>
      * </p>
      *
-     * @since 1.3.0
+     * @since 14
      */
     @Parameter
     private List<File> fileAssociations;
@@ -275,7 +334,7 @@ public class JPackageMojo extends AbstractMojo {
      *
      * <p>element for each launcher.</p>
      *
-     * @since 1.3.0
+     * @since 14
      */
     @Parameter
     private List<Launcher> launchers;
@@ -283,7 +342,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * <p>--add-modules &lt;module>[,&lt;module>]</p>
      *
-     * @since 1.4.0
+     * @since 14
      */
     @Parameter
     private List<String> addModules;
@@ -291,7 +350,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * <p>--app-image &lt;path to application image></p>
      *
-     * @since 1.5.0
+     * @since 14
      */
     @Parameter
     private File appImage;
@@ -307,18 +366,74 @@ public class JPackageMojo extends AbstractMojo {
      * &lt;/additionalOptions>
      * </pre>
      * </p>
-     *
-     * @since 1.5.0
      */
     @Parameter
     private List<String> additionalOptions;
+
+    /**
+     * <p>jlink options.</p>
+     *
+     * <p>Example:
+     * <pre>
+     * &lt;jLinkOptions>
+     *     &lt;jLinkOption>--strip-native-commands&lt;/jLinkOption>
+     *     &lt;jLinkOption>--strip-debug&lt;/jLinkOption>
+     * &lt;/jLinkOptions>
+     * </pre>
+     * </p>
+     *
+     * @since 16
+     */
+    @Parameter
+    private List<String> jLinkOptions;
+
+    /**
+     * <p>--bind-services</p>
+     * <p>This option is supported by jpackage versions 14 and 15 only.</p>
+     *
+     * @since 14
+     */
+    @Parameter
+    private boolean bindServices;
+
+    /**
+     * --about-url &lt;url>
+     *
+     * @since 17
+     */
+    @Parameter
+    private String aboutUrl;
+
+    /**
+     * <p>--app-content additional-content[,additional-content...]</p>
+     * <p>Example:
+     * <pre>
+     * &lt;appContentPaths>
+     *     &lt;appContentPath>./docs&lt;/appContentPath>
+     *     &lt;appContentPath>./images&lt;/appContentPath>
+     * &lt;/appContentPaths>
+     * </pre>
+     * </p>
+     *
+     * @since 18
+     */
+    @Parameter
+    private List<File> appContentPaths;
+
+    /**
+     * --launcher-as-service
+     *
+     * @since 19
+     */
+    @Parameter
+    private boolean launcherAsService;
 
     // Windows specific parameters
 
     /**
      * --win-menu
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private boolean winMenu;
@@ -326,15 +441,23 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --win-dir-chooser
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private boolean winDirChooser;
 
     /**
+     * --win-help-url &lt;url>
+     *
+     * @since 17
+     */
+    @Parameter
+    private String winHelpUrl;
+
+    /**
      * --win-upgrade-uuid &lt;id string>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String winUpgradeUuid;
@@ -342,7 +465,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --win-menu-group &lt;menu group name>
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private String winMenuGroup;
@@ -350,15 +473,31 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --win-shortcut
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private boolean winShortcut;
 
     /**
+     * --win-shortcut-prompt
+     *
+     * @since 17
+     */
+    @Parameter
+    private boolean winShortcutPrompt;
+
+    /**
+     * --win-update-url &lt;url>
+     *
+     * @since 17
+     */
+    @Parameter
+    private String winUpdateUrl;
+
+    /**
      * --win-per-user-install
      *
-     * @since 0.0.1
+     * @since 14
      */
     @Parameter
     private boolean winPerUserInstall;
@@ -366,7 +505,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --win-console
      *
-     * @since 1.3.0
+     * @since 14
      */
     @Parameter
     private boolean winConsole;
@@ -376,7 +515,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --mac-package-identifier &lt;ID string>
      *
-     * @since 0.0.2
+     * @since 14
      */
     @Parameter
     private String macPackageIdentifier;
@@ -384,15 +523,24 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --mac-package-name &lt;name string>
      *
-     * @since 0.0.2
+     * @since 14
      */
     @Parameter
     private String macPackageName;
 
     /**
+     * <p>--mac-bundle-signing-prefix &lt;prefix string></p>
+     * <p>This option is supported by jpackage versions 14, 15 and 16 only.</p>
+     *
+     * @since 14
+     */
+    @Parameter
+    private String macBundleSigningPrefix;
+
+    /**
      * --mac-package-signing-prefix &lt;prefix string>
      *
-     * @since 0.0.2
+     * @since 17
      */
     @Parameter
     private String macPackageSigningPrefix;
@@ -400,7 +548,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --mac-sign
      *
-     * @since 0.0.2
+     * @since 14
      */
     @Parameter
     private boolean macSign;
@@ -408,7 +556,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --mac-signing-keychain &lt;file path>
      *
-     * @since 0.0.2
+     * @since 14
      */
     @Parameter
     private File macSigningKeychain;
@@ -416,17 +564,58 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --mac-signing-key-user-name &lt;team name>
      *
-     * @since 0.0.2
+     * @since 14
      */
     @Parameter
     private String macSigningKeyUserName;
+
+    /**
+     * --mac-app-store
+     *
+     * @since 17
+     */
+    @Parameter
+    private boolean macAppStore;
+
+    /**
+     * --mac-entitlements &lt;file path>
+     *
+     * @since 17
+     */
+    @Parameter
+    private File macEntitlements;
+
+    /**
+     * --mac-app-category &lt;category string>
+     *
+     * @since 17
+     */
+    @Parameter
+    private String macAppCategory;
+
+    /**
+     * <p>--mac-dmg-content additional-content[,additional-content...]</p>
+     * <p>Example:
+     * <pre>
+     * &lt;macDmgContentPaths>
+     *     &lt;macDmgContentPath>./docs&lt;/macDmgContentPath>
+     *     &lt;macDmgContentPath>./images&lt;/macDmgContentPath>
+     * &lt;/macDmgContentPaths>
+     * </pre>
+     * </p>
+     *
+     * @since 18
+     */
+    @Parameter
+    private List<File> macDmgContentPaths;
+
 
     // Linux specific parameters
 
     /**
      * --linux-package-name &lt;package name>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxPackageName;
@@ -434,7 +623,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --linux-deb-maintainer &lt;email address>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxDebMaintainer;
@@ -442,15 +631,23 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --linux-menu-group &lt;menu-group-name>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxMenuGroup;
 
     /**
+     * --linux-package-deps
+     *
+     * @since 14
+     */
+    @Parameter
+    private boolean linuxPackageDeps;
+
+    /**
      * --linux-rpm-license-type &lt;type string>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxRpmLicenseType;
@@ -458,7 +655,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --linux-app-release &lt;release value>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxAppRelease;
@@ -466,7 +663,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --linux-app-category &lt;category value>
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private String linuxAppCategory;
@@ -474,7 +671,7 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * --linux-shortcut
      *
-     * @since 0.0.3
+     * @since 14
      */
     @Parameter
     private boolean linuxShortcut;
@@ -491,10 +688,16 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         String executable = getJPackageExecutable(tc)
-            .orElseThrow(() -> new MojoExecutionException("Failed to find " + EXECUTABLE));
-        getLog().info("Using: " + executable);
+                .orElseThrow(() -> new MojoExecutionException("Failed to find " + EXECUTABLE));
 
-        Commandline commandLine = buildParameters();
+        int majorVersion = getMajorVersion(executable);
+        if (majorVersion == 0) {
+            throw new MojoExecutionException("Could not determine " + EXECUTABLE + " version");
+        } else {
+            getLog().info("Using: " + executable + ", major version: " + majorVersion);
+        }
+
+        Commandline commandLine = buildParameters(majorVersion);
         commandLine.setExecutable(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
 
         boolean dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
@@ -545,7 +748,7 @@ public class JPackageMojo extends AbstractMojo {
     private Optional<String> getJPackageExecutable(Toolchain tc) {
         Optional<String> executable = getJPackageFromToolchain(tc);
         return executable.isPresent() ?
-            executable : getJPackageFromJdkHome(System.getProperty("java.home"));
+                executable : getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
     private void execute(Commandline commandline) throws Exception {
@@ -565,7 +768,7 @@ public class JPackageMojo extends AbstractMojo {
                 }
 
                 StringBuilder msg = new StringBuilder("\nExit code: ")
-                    .append(exitCode);
+                        .append(exitCode);
                 String errOutput = err.getOutput();
                 if (isNotEmpty(errOutput)) {
                     msg.append(" - ").append(errOutput);
@@ -586,63 +789,76 @@ public class JPackageMojo extends AbstractMojo {
         }
     }
 
-    private Commandline buildParameters() throws MojoFailureException {
+    private Commandline buildParameters(int version) throws MojoFailureException {
         getLog().info("jpackage options:");
 
         Commandline commandline = new Commandline();
-        addMandatoryParameter(commandline, "--name", name);
-        addMandatoryParameter(commandline, "--dest", destination);
-        addParameter(commandline, "--verbose", verbose);
-        addParameter(commandline, type);
-        addParameter(commandline, "--app-version", appVersion);
-        addParameter(commandline, "--copyright", copyright);
-        addParameter(commandline, "--description", description);
-        addParameter(commandline, "--runtime-image", runtimeImage, true);
-        addParameter(commandline, "--input", input, true);
-        addParameter(commandline, "--install-dir", installDir);
-        addParameter(commandline, "--resource-dir", resourceDir, true);
-        addParameter(commandline, "--vendor", vendor);
-        addParameter(commandline, "--module", module);
-        addParameter(commandline, "--main-class", mainClass);
-        addParameter(commandline, "--main-jar", mainJar);
-        addParameter(commandline, "--temp", temp);
-        addParameter(commandline, "--icon", icon, true);
-        addParameter(commandline, "--license-file", licenseFile, true);
-        addParameter(commandline, "--app-image", appImage, true);
+        addMandatoryParameter(commandline, NAME, name, version);
+        addMandatoryParameter(commandline, DESTINATION, destination, false, version);
+        addParameter(commandline, VERBOSE, verbose, version);
+        addParameter(commandline, TYPE, type, version);
+        addParameter(commandline, APP_VERSION, appVersion, version);
+        addParameter(commandline, COPYRIGHT, copyright, version);
+        addParameter(commandline, DESCRIPTION, description, version);
+        addParameter(commandline, RUNTIME_IMAGE, runtimeImage, true, version);
+        addParameter(commandline, INPUT, input, true, version);
+        addParameter(commandline, INSTALL_DIR, installDir, false, version);
+        addParameter(commandline, RESOURCE_DIR, resourceDir, true, version);
+        addParameter(commandline, VENDOR, vendor, version);
+        addParameter(commandline, MODULE, module, version);
+        addParameter(commandline, MAIN_CLASS, mainClass, version);
+        addParameter(commandline, MAIN_JAR, mainJar, version);
+        addParameter(commandline, TEMP, temp, false, version);
+        addParameter(commandline, ICON, icon, true, version);
+        addParameter(commandline, LICENSE_FILE, licenseFile, true, version);
+        addParameter(commandline, ABOUT_URL, aboutUrl, version);
+        addParameter(commandline, APP_IMAGE, appImage, true, version);
+        addParameter(commandline, LAUNCHER_AS_SERVICE, launcherAsService, version);
 
         if (modulePaths != null) {
             for (File modulePath : modulePaths) {
-                addParameter(commandline, "--module-path", modulePath, true);
+                addParameter(commandline, MODULE_PATH, modulePath, true, version);
             }
         }
 
         if (addModules != null && !addModules.isEmpty()) {
-            addParameter(commandline, "--add-modules", String.join(",", addModules));
+            addParameter(commandline, ADD_MODULES, String.join(",", addModules), version);
+        }
+
+        addParameter(commandline, BIND_SERVICES, bindServices, version);
+        if (jLinkOptions != null && !jLinkOptions.isEmpty()) {
+            addParameter(commandline, JLINK_OPTIONS, String.join(" ", jLinkOptions), version);
         }
 
         if (javaOptions != null) {
             for (String option : javaOptions) {
-                addParameter(commandline, "--java-options", escape(option));
+                addParameter(commandline, JAVA_OPTIONS, escape(option), version);
             }
         }
 
         if (arguments != null) {
             for (String arg : arguments) {
-                addParameter(commandline, "--arguments", escape(arg));
+                addParameter(commandline, ARGUMENTS, escape(arg), version);
             }
         }
 
         if (fileAssociations != null) {
             for (File association : fileAssociations) {
-                addParameter(commandline, "--file-associations", association, true);
+                addParameter(commandline, FILE_ASSOCIATIONS, association, true, version);
+            }
+        }
+
+        if (appContentPaths != null) {
+            for (File appContent : appContentPaths) {
+                addParameter(commandline, APP_CONTENT, appContent, true, version);
             }
         }
 
         if (launchers != null) {
             for (Launcher launcher : launchers) {
                 launcher.validate();
-                addParameter(commandline, "--add-launcher",
-                    launcher.getName() + "=" + launcher.getFile().getAbsolutePath());
+                addParameter(commandline, ADD_LAUNCHER,
+                        launcher.getName() + "=" + launcher.getFile().getAbsolutePath(), version);
             }
         }
 
@@ -653,51 +869,69 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (isMac()) {
-            addParameter(commandline, "--mac-package-identifier", macPackageIdentifier);
-            addParameter(commandline, "--mac-package-name", macPackageName);
-            addParameter(commandline, "--mac-package-signing-prefix", macPackageSigningPrefix);
-            addParameter(commandline, "--mac-sign", macSign);
-            addParameter(commandline, "--mac-signing-keychain", macSigningKeychain, true);
-            addParameter(commandline, "--mac-signing-key-user-name", macSigningKeyUserName);
+            addParameter(commandline, MAC_PACKAGE_IDENTIFIER, macPackageIdentifier, version);
+            addParameter(commandline, MAC_PACKAGE_NAME, macPackageName, version);
+            addParameter(commandline, MAC_BUNDLE_SIGNING_PREFIX, macBundleSigningPrefix, version);
+            addParameter(commandline, MAC_PACKAGE_SIGNING_PREFIX, macPackageSigningPrefix, version);
+            addParameter(commandline, MAC_SIGN, macSign, version);
+            addParameter(commandline, MAC_SIGNING_KEYCHAIN, macSigningKeychain, true, version);
+            addParameter(commandline, MAC_SIGNING_KEY_USER_NAME, macSigningKeyUserName, version);
+            addParameter(commandline, MAC_APP_STORE, macAppStore, version);
+            addParameter(commandline, MAC_ENTITLEMENTS, macEntitlements, true, version);
+            addParameter(commandline, MAC_APP_CATEGORY, macAppCategory, version);
+            if (macDmgContentPaths != null) {
+                for (File content : macDmgContentPaths) {
+                    addParameter(commandline, MAC_DMG_CONTENT, content, true, version);
+                }
+            }
         } else if (isWindows()) {
-            addParameter(commandline, "--win-menu", winMenu);
-            addParameter(commandline, "--win-dir-chooser", winDirChooser);
-            addParameter(commandline, "--win-upgrade-uuid", winUpgradeUuid);
-            addParameter(commandline, "--win-menu-group", winMenuGroup);
-            addParameter(commandline, "--win-shortcut", winShortcut);
-            addParameter(commandline, "--win-per-user-install", winPerUserInstall);
-            addParameter(commandline, "--win-console", winConsole);
+            addParameter(commandline, WIN_CONSOLE, winConsole, version);
+            addParameter(commandline, WIN_DIR_CHOOSER, winDirChooser, version);
+            addParameter(commandline, WIN_HELP_URL, winHelpUrl, version);
+            addParameter(commandline, WIN_MENU, winMenu, version);
+            addParameter(commandline, WIN_MENU_GROUP, winMenuGroup, version);
+            addParameter(commandline, WIN_PER_USER_INSTALL, winPerUserInstall, version);
+            addParameter(commandline, WIN_SHORTCUT, winShortcut, version);
+            addParameter(commandline, WIN_SHORTCUT_PROMPT, winShortcutPrompt, version);
+            addParameter(commandline, WIN_UPDATE_URL, winUpdateUrl, version);
+            addParameter(commandline, WIN_UPGRADE_UUID, winUpgradeUuid, version);
         } else if (isLinux()) {
-            addParameter(commandline, "--linux-package-name", linuxPackageName);
-            addParameter(commandline, "--linux-deb-maintainer", linuxDebMaintainer);
-            addParameter(commandline, "--linux-menu-group", linuxMenuGroup);
-            addParameter(commandline, "--linux-rpm-license-type", linuxRpmLicenseType);
-            addParameter(commandline, "--linux-app-release", linuxAppRelease);
-            addParameter(commandline, "--linux-app-category", linuxAppCategory);
-            addParameter(commandline, "--linux-shortcut", linuxShortcut);
+            addParameter(commandline, LINUX_PACKAGE_NAME, linuxPackageName, version);
+            addParameter(commandline, LINUX_DEB_MAINTAINER, linuxDebMaintainer, version);
+            addParameter(commandline, LINUX_MENU_GROUP, linuxMenuGroup, version);
+            addParameter(commandline, LINUX_PACKAGE_DEPS, linuxPackageDeps, version);
+            addParameter(commandline, LINUX_RPM_LICENSE_TYPE, linuxRpmLicenseType, version);
+            addParameter(commandline, LINUX_APP_RELEASE, linuxAppRelease, version);
+            addParameter(commandline, LINUX_APP_CATEGORY, linuxAppCategory, version);
+            addParameter(commandline, LINUX_SHORTCUT, linuxShortcut, version);
         }
 
         return commandline;
     }
 
-    private void addMandatoryParameter(Commandline commandline,
-                                       @SuppressWarnings("SameParameterValue") String name,
-                                       String value) throws MojoFailureException
-    {
+    private void addMandatoryParameter(
+            Commandline commandline,
+            @SuppressWarnings("SameParameterValue") CommandLineParameter parameter,
+            String value,
+            int version
+    ) throws MojoFailureException {
         if (value == null || value.isEmpty()) {
-            throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
+            throw new MojoFailureException("Mandatory parameter \"" + parameter.getName() + "\" cannot be null or empty");
         }
-        addParameter(commandline, name, value);
+        addParameter(commandline, parameter, value, version);
     }
 
-    private void addMandatoryParameter(Commandline commandline,
-                                       @SuppressWarnings("SameParameterValue") String name,
-                                       File value) throws MojoFailureException
-    {
+    private void addMandatoryParameter(
+            Commandline commandline,
+            @SuppressWarnings("SameParameterValue") CommandLineParameter parameter,
+            File value,
+            boolean checkExistence,
+            int version
+    ) throws MojoFailureException {
         if (value == null) {
-            throw new MojoFailureException("Mandatory parameter \"" + name + "\" cannot be null or empty");
+            throw new MojoFailureException("Mandatory parameter \"" + parameter.getName() + "\" cannot be null or empty");
         }
-        addParameter(commandline, name, value);
+        addParameter(commandline, parameter, value, checkExistence, version);
     }
 
     private void addParameter(Commandline commandline, String name, String value) {
@@ -710,20 +944,41 @@ public class JPackageMojo extends AbstractMojo {
         commandline.createArg().setValue(value);
     }
 
-    private void addParameter(Commandline commandline, String name, File value) throws MojoFailureException {
-        addParameter(commandline, name, value, false);
+    private void addParameter(
+            Commandline commandline,
+            CommandLineParameter parameter,
+            String value,
+            int version
+    ) throws MojoFailureException {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+
+        parameter.checkVersion(version);
+
+        getLog().info("  " + parameter.getName() + " " + value);
+        commandline.createArg().setValue(parameter.getName());
+        commandline.createArg().setValue(value);
     }
 
-    private void addParameter(Commandline commandline, String name, File value, boolean checkExistence) throws MojoFailureException {
+    private void addParameter(
+            Commandline commandline,
+            CommandLineParameter parameter,
+            File value,
+            boolean checkExistence,
+            int version
+    ) throws MojoFailureException {
         if (value == null) {
             return;
         }
+
+        parameter.checkVersion(version);
 
         if (checkExistence && !value.exists()) {
             throw new MojoFailureException("File or directory " + value.getAbsolutePath() + " does not exist");
         }
 
-        addParameter(commandline, name, value.getAbsolutePath());
+        addParameter(commandline, parameter.getName(), value.getAbsolutePath());
     }
 
     private void addParameter(Commandline commandline, String name) {
@@ -735,20 +990,55 @@ public class JPackageMojo extends AbstractMojo {
         commandline.createArg().setValue(name);
     }
 
-    private void addParameter(Commandline commandline, String name, boolean value) {
+    private void addParameter(
+            Commandline commandline,
+            CommandLineParameter parameter,
+            boolean value,
+            int version
+    ) throws MojoFailureException {
         if (!value) {
             return;
         }
 
-        getLog().info("  " + name);
-        commandline.createArg().setValue(name);
+        parameter.checkVersion(version);
+
+        getLog().info("  " + parameter.getName());
+        commandline.createArg().setValue(parameter.getName());
     }
 
-    private void addParameter(Commandline commandline, EnumParameter value) {
+    private void addParameter(
+            Commandline commandline,
+            CommandLineParameter parameter,
+            EnumParameter value,
+            int version
+    ) throws MojoFailureException {
         if (value == null) {
             return;
         }
 
-        addParameter(commandline, value.getParameterName(), value.getValue());
+        addParameter(commandline, parameter, value.getValue(), version);
+    }
+
+    private int getMajorVersion(String executable) {
+        Commandline commandLine = new Commandline();
+        commandLine.createArg().setValue("--version");
+        commandLine.setExecutable(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
+
+        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
+        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+
+        try {
+            int exitCode = CommandLineUtils.executeCommandLine(commandLine, out, err);
+            if (exitCode != 0) {
+                return 0;
+            } else {
+                String output = isEmpty(out.getOutput()) ? "0" : out.getOutput().trim();
+                int dotIndex = output.indexOf(".");
+                String versionString = dotIndex == -1 ? output : output.substring(0, dotIndex);
+                return Integer.parseInt(versionString);
+            }
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

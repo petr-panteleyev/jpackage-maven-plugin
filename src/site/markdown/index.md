@@ -25,3 +25,12 @@ you can take a look into the following examples:
 * [Image with full JRE](./examples/full-jre.html)
 * [Configuration via executions](./examples/executions.html)
 * [Configuration via profiles](./examples/profiles.html)
+
+### jpackage Documentation
+
+* 19: https://docs.oracle.com/en/java/javase/19/docs/specs/man/jpackage.html
+* 18: https://docs.oracle.com/en/java/javase/18/docs/specs/man/jpackage.html
+* 17: https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html
+* 16: https://docs.oracle.com/en/java/javase/16/docs/specs/man/jpackage.html
+* 15: https://docs.oracle.com/en/java/javase/15/docs/specs/man/jpackage.html
+* 14: https://docs.oracle.com/en/java/javase/14/docs/specs/man/jpackage.html

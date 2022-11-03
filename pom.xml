@@ -6,7 +6,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.5.2</version>
+    <version>1.6.0</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -44,10 +44,10 @@
         <testNgVersion>7.3.0</testNgVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
+        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <mavenPluginPluginVersion>3.6.0</mavenPluginPluginVersion>
-        <mavenSitePluginVersion>3.7.1</mavenSitePluginVersion>
+        <mavenSitePluginVersion>3.12.1</mavenSitePluginVersion>
         <mavenProjectInfoReportsPluginVersion>3.0.0</mavenProjectInfoReportsPluginVersion>
         <mavenSourcePluginVersion>3.2.0</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>

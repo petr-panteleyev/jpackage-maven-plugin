@@ -1,6 +1,7 @@
 ## Usage
 
-For detailed information about ```jpackage``` please refer to [Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf).
+For detailed information about ```jpackage``` please refer to
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/19/jpackage/packaging-tool-user-guide.pdf).
 
 ### Finding jpackage
 
@@ -46,6 +47,9 @@ The following plugin parameters define directory or file location:
 * temp
 * licenseFile
 * launcher.file
+* appContentPath
+* macEntitlements
+* macDmgContentPath
  
 If path is not absolute is will be resolved as relative to ```${project.basedir}```.
 
@@ -114,6 +118,19 @@ _Example:_
 ```
 
 Note: apparently this option does not work for modular applications.
+
+#### jlink options
+
+Options that are passed to underlying jlink call.
+
+_Example:_
+
+```xml
+<jLinkOptions>
+    <jLinkOption>--strip-native-commands</jLinkOption>
+    <jLinkOption>--strip-debug</jLinkOption>
+</jLinkOptions>
+```
 
 #### Additional JPackage Options
 

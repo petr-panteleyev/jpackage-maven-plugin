@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
 
@@ -17,11 +17,6 @@ public enum ImageType implements EnumParameter {
 
     ImageType(String value) {
         this.value = value;
-    }
-
-    @Override
-    public String getParameterName() {
-        return "--type";
     }
 
     @Override
