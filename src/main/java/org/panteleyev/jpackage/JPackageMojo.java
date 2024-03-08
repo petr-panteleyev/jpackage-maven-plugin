@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
@@ -92,7 +92,7 @@ import static org.panteleyev.jpackage.StringUtil.isNotEmpty;
  * <p>Generates application package.</p>
  * <p>Each plugin parameter defines <code>jpackage</code> option.
  * For detailed information about these options please refer to
- * <a href="https://docs.oracle.com/en/java/javase/15/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
+ * <a href="https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
  */
 @Mojo(name = JPackageMojo.GOAL, defaultPhase = LifecyclePhase.NONE)
 public class JPackageMojo extends AbstractMojo {
@@ -802,7 +802,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(commandline, DESCRIPTION, description, version);
         addParameter(commandline, RUNTIME_IMAGE, runtimeImage, true, version);
         addParameter(commandline, INPUT, input, true, version);
-        addParameter(commandline, INSTALL_DIR, installDir, false, version);
+        addParameter(commandline, INSTALL_DIR, installDir, false, false, version);
         addParameter(commandline, RESOURCE_DIR, resourceDir, true, version);
         addParameter(commandline, VENDOR, vendor, version);
         addParameter(commandline, MODULE, module, version);
@@ -968,17 +968,37 @@ public class JPackageMojo extends AbstractMojo {
             boolean checkExistence,
             int version
     ) throws MojoFailureException {
+        addParameter(
+                commandline,
+                parameter,
+                value,
+                checkExistence,
+                true,
+                version
+        );
+    }
+
+    private void addParameter(
+            Commandline commandline,
+            CommandLineParameter parameter,
+            File value,
+            boolean checkExistence,
+            boolean makeAbsolute,
+            int version
+    ) throws MojoFailureException {
         if (value == null) {
             return;
         }
 
         parameter.checkVersion(version);
 
+        String path = makeAbsolute ? value.getAbsolutePath() : value.getPath();
+
         if (checkExistence && !value.exists()) {
-            throw new MojoFailureException("File or directory " + value.getAbsolutePath() + " does not exist");
+            throw new MojoFailureException("File or directory " + path + " does not exist");
         }
 
-        addParameter(commandline, parameter.getName(), value.getAbsolutePath());
+        addParameter(commandline, parameter.getName(), path);
     }
 
     private void addParameter(Commandline commandline, String name) {

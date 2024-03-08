@@ -53,6 +53,8 @@ The following plugin parameters define directory or file location:
  
 If path is not absolute is will be resolved as relative to ```${project.basedir}```.
 
+One exception is ```installDir``` which is passed as is.
+
 #### Java Options
 
 &lt;javaOptions> defines options for JVM running the application. Each option should be specified in a separate 

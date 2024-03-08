@@ -1,6 +1,6 @@
 ## JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.java.net/jeps/343) tool available since JDK-14.
+Maven plugin for [jpackage](https://openjdk.java.net/jeps/343).
 
 ### Goals Overview
 
@@ -28,6 +28,8 @@ you can take a look into the following examples:
 
 ### jpackage Documentation
 
+* 21: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jpackage.html
+* 20: https://docs.oracle.com/en/java/javase/20/docs/specs/man/jpackage.html
 * 19: https://docs.oracle.com/en/java/javase/19/docs/specs/man/jpackage.html
 * 18: https://docs.oracle.com/en/java/javase/18/docs/specs/man/jpackage.html
 * 17: https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html
