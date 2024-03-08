@@ -193,12 +193,12 @@ public class JPackageMojo extends AbstractMojo {
     private File input;
 
     /**
-     * --install-dir &lt;file path>
+     * --install-dir &lt;dir path>
      *
      * @since 14
      */
     @Parameter
-    private File installDir;
+    private String installDir;
 
     /**
      * --resource-dir &lt;resource dir path>
@@ -802,7 +802,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(commandline, DESCRIPTION, description, version);
         addParameter(commandline, RUNTIME_IMAGE, runtimeImage, true, version);
         addParameter(commandline, INPUT, input, true, version);
-        addParameter(commandline, INSTALL_DIR, installDir, false, false, version);
+        addParameter(commandline, INSTALL_DIR, installDir, version);
         addParameter(commandline, RESOURCE_DIR, resourceDir, true, version);
         addParameter(commandline, VENDOR, vendor, version);
         addParameter(commandline, MODULE, module, version);
