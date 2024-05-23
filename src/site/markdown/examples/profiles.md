@@ -11,18 +11,20 @@
                     <family>windows</family>
                 </os>
             </activation>
-            <plugins>
-                <plugin>
-                    <groupId>org.panteleyev</groupId>
-                    <artifactId>jpackage-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>1.6.3</version>
 
-                    <configuration>
-                        <icon>icons/icons.ico</icon>
-                        <winMenu>true</winMenu>
-                    </configuration>
-                </plugin>
-            </plugins>
+                        <configuration>
+                            <icon>icons/icons.ico</icon>
+                            <winMenu>true</winMenu>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>mac</id>
@@ -31,17 +33,19 @@
                     <family>mac</family>
                 </os>
             </activation>
-            <plugins>
-                <plugin>
-                    <groupId>org.panteleyev</groupId>
-                    <artifactId>jpackage-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>1.6.3</version>
 
-                    <configuration>
-                        <icon>icons/icons.icns</icon>
-                    </configuration>
-                </plugin>
-            </plugins>
+                        <configuration>
+                            <icon>icons/icons.icns</icon>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
