@@ -16,7 +16,7 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.3</version>
+                        <version>2.0.0</version>
 
                         <configuration>
                             <icon>icons/icons.ico</icon>
@@ -38,7 +38,7 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.3</version>
+                        <version>2.0.0</version>
 
                         <configuration>
                             <icon>icons/icons.icns</icon>
@@ -54,7 +54,7 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
-                <version>1.4.0</version>
+                <version>2.0.0</version>
 
                 <!-- Common part of configuration -->
                 <configuration>

@@ -17,6 +17,8 @@ import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -96,6 +98,8 @@ import static org.panteleyev.jpackage.StringUtil.isNotEmpty;
  */
 @Mojo(name = JPackageMojo.GOAL, defaultPhase = LifecyclePhase.NONE)
 public class JPackageMojo extends AbstractMojo {
+    private static final Logger logger = LoggerFactory.getLogger(JPackageMojo.class);
+
     public static final String GOAL = "jpackage";
 
     private static final String TOOLCHAIN = "jdk";
@@ -678,31 +682,31 @@ public class JPackageMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
-            getLog().info("Skipping plugin execution");
+            logger.info("Skipping plugin execution");
             return;
         }
 
-        Toolchain tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
+        var tc = toolchainManager.getToolchainFromBuildContext(TOOLCHAIN, session);
         if (tc != null) {
-            getLog().info("Toolchain in jpackage-maven-plugin: " + tc);
+            logger.info("Toolchain in jpackage-maven-plugin: {}", tc);
         }
 
-        String executable = getJPackageExecutable(tc)
+        var executable = getJPackageExecutable(tc)
                 .orElseThrow(() -> new MojoExecutionException("Failed to find " + EXECUTABLE));
 
-        int majorVersion = getMajorVersion(executable);
+        var majorVersion = getMajorVersion(executable);
         if (majorVersion == 0) {
             throw new MojoExecutionException("Could not determine " + EXECUTABLE + " version");
         } else {
-            getLog().info("Using: " + executable + ", major version: " + majorVersion);
+            logger.info("Using: {}, major version: {}", executable, majorVersion);
         }
 
-        Commandline commandLine = buildParameters(majorVersion);
+        var commandLine = buildParameters(majorVersion);
         commandLine.setExecutable(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
 
-        boolean dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
+        var dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
         if (dryRun) {
-            getLog().warn("Dry-run mode, not executing " + EXECUTABLE);
+            logger.warn("Dry-run mode, not executing {}", EXECUTABLE);
         } else {
             try {
                 execute(commandLine);
@@ -717,9 +721,9 @@ public class JPackageMojo extends AbstractMojo {
             return Optional.empty();
         }
 
-        getLog().debug("Looking for " + EXECUTABLE + " in " + jdkHome);
+        logger.debug("Looking for " + EXECUTABLE + " in {}", jdkHome);
 
-        String executable = jdkHome + File.separator + "bin" + File.separator + EXECUTABLE;
+        var executable = jdkHome + File.separator + "bin" + File.separator + EXECUTABLE;
         if (isWindows()) {
             executable = executable + ".exe";
         }
@@ -727,7 +731,7 @@ public class JPackageMojo extends AbstractMojo {
         if (new File(executable).exists()) {
             return Optional.of(executable);
         } else {
-            getLog().warn("File " + executable + " does not exist");
+            logger.warn("File {} does not exist", executable);
             return Optional.empty();
         }
     }
@@ -737,39 +741,39 @@ public class JPackageMojo extends AbstractMojo {
             return Optional.empty();
         }
 
-        String executable = tc.findTool(EXECUTABLE);
+        var executable = tc.findTool(EXECUTABLE);
         if (executable == null) {
-            getLog().warn(EXECUTABLE + " is not part of configured toolchain");
+            logger.warn(EXECUTABLE + " is not part of configured toolchain");
         }
 
         return Optional.ofNullable(executable);
     }
 
     private Optional<String> getJPackageExecutable(Toolchain tc) {
-        Optional<String> executable = getJPackageFromToolchain(tc);
+        var executable = getJPackageFromToolchain(tc);
         return executable.isPresent() ?
                 executable : getJPackageFromJdkHome(System.getProperty("java.home"));
     }
 
     private void execute(Commandline commandline) throws Exception {
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+        var err = new CommandLineUtils.StringStreamConsumer();
+        var out = new CommandLineUtils.StringStreamConsumer();
 
         try {
-            int exitCode = CommandLineUtils.executeCommandLine(commandline, out, err);
+            var exitCode = CommandLineUtils.executeCommandLine(commandline, out, err);
 
-            String output = (isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim());
+            var output = (isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim());
 
             if (exitCode != 0) {
                 if (isNotEmpty(output)) {
-                    for (String line : output.split("\n")) {
-                        getLog().error(line);
+                    for (var line : output.split("\n")) {
+                        logger.error(line);
                     }
                 }
 
-                StringBuilder msg = new StringBuilder("\nExit code: ")
+                var msg = new StringBuilder("\nExit code: ")
                         .append(exitCode);
-                String errOutput = err.getOutput();
+                var errOutput = err.getOutput();
                 if (isNotEmpty(errOutput)) {
                     msg.append(" - ").append(errOutput);
                 }
@@ -779,8 +783,8 @@ public class JPackageMojo extends AbstractMojo {
                 throw new MojoExecutionException(msg.toString());
             } else {
                 if (isNotEmpty(output)) {
-                    for (String outputLine : output.split("\n")) {
-                        getLog().info(outputLine);
+                    for (var outputLine : output.split("\n")) {
+                        logger.info(outputLine);
                     }
                 }
             }
@@ -790,9 +794,9 @@ public class JPackageMojo extends AbstractMojo {
     }
 
     private Commandline buildParameters(int version) throws MojoFailureException {
-        getLog().info("jpackage options:");
+        logger.info("jpackage options:");
 
-        Commandline commandline = new Commandline();
+        var commandline = new Commandline();
         addMandatoryParameter(commandline, NAME, name, version);
         addMandatoryParameter(commandline, DESTINATION, destination, false, version);
         addParameter(commandline, VERBOSE, verbose, version);
@@ -816,7 +820,7 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(commandline, LAUNCHER_AS_SERVICE, launcherAsService, version);
 
         if (modulePaths != null) {
-            for (File modulePath : modulePaths) {
+            for (var modulePath : modulePaths) {
                 addParameter(commandline, MODULE_PATH, modulePath, true, version);
             }
         }
@@ -831,13 +835,13 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (javaOptions != null) {
-            for (String option : javaOptions) {
+            for (var option : javaOptions) {
                 addParameter(commandline, JAVA_OPTIONS, escape(option), version);
             }
         }
 
         if (arguments != null) {
-            for (String arg : arguments) {
+            for (var arg : arguments) {
                 addParameter(commandline, ARGUMENTS, escape(arg), version);
             }
         }
@@ -849,13 +853,13 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (appContentPaths != null) {
-            for (File appContent : appContentPaths) {
+            for (var appContent : appContentPaths) {
                 addParameter(commandline, APP_CONTENT, appContent, true, version);
             }
         }
 
         if (launchers != null) {
-            for (Launcher launcher : launchers) {
+            for (var launcher : launchers) {
                 launcher.validate();
                 addParameter(commandline, ADD_LAUNCHER,
                         launcher.getName() + "=" + launcher.getFile().getAbsolutePath(), version);
@@ -863,7 +867,7 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (additionalOptions != null) {
-            for (String option : additionalOptions) {
+            for (var option : additionalOptions) {
                 addParameter(commandline, option);
             }
         }
@@ -939,7 +943,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info("  " + name + " " + value);
+        logger.info("  {} {}", name, value);
         commandline.createArg().setValue(name);
         commandline.createArg().setValue(value);
     }
@@ -956,7 +960,7 @@ public class JPackageMojo extends AbstractMojo {
 
         parameter.checkVersion(version);
 
-        getLog().info("  " + parameter.getName() + " " + value);
+        logger.info("  {} {}", parameter.getName(), value);
         commandline.createArg().setValue(parameter.getName());
         commandline.createArg().setValue(value);
     }
@@ -992,7 +996,7 @@ public class JPackageMojo extends AbstractMojo {
 
         parameter.checkVersion(version);
 
-        String path = makeAbsolute ? value.getAbsolutePath() : value.getPath();
+        var path = makeAbsolute ? value.getAbsolutePath() : value.getPath();
 
         if (checkExistence && !value.exists()) {
             throw new MojoFailureException("File or directory " + path + " does not exist");
@@ -1006,7 +1010,7 @@ public class JPackageMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info("  " + name);
+        logger.info("  {}", name);
         commandline.createArg().setValue(name);
     }
 
@@ -1022,7 +1026,7 @@ public class JPackageMojo extends AbstractMojo {
 
         parameter.checkVersion(version);
 
-        getLog().info("  " + parameter.getName());
+        logger.info("  {}", parameter.getName());
         commandline.createArg().setValue(parameter.getName());
     }
 
@@ -1040,21 +1044,21 @@ public class JPackageMojo extends AbstractMojo {
     }
 
     private int getMajorVersion(String executable) {
-        Commandline commandLine = new Commandline();
+        var commandLine = new Commandline();
         commandLine.createArg().setValue("--version");
         commandLine.setExecutable(executable.contains(" ") ? ("\"" + executable + "\"") : executable);
 
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+        var err = new CommandLineUtils.StringStreamConsumer();
+        var out = new CommandLineUtils.StringStreamConsumer();
 
         try {
-            int exitCode = CommandLineUtils.executeCommandLine(commandLine, out, err);
+            var exitCode = CommandLineUtils.executeCommandLine(commandLine, out, err);
             if (exitCode != 0) {
                 return 0;
             } else {
-                String output = isEmpty(out.getOutput()) ? "0" : out.getOutput().trim();
-                int dotIndex = output.indexOf(".");
-                String versionString = dotIndex == -1 ? output : output.substring(0, dotIndex);
+                var output = isEmpty(out.getOutput()) ? "0" : out.getOutput().trim();
+                var dotIndex = output.indexOf(".");
+                var versionString = dotIndex == -1 ? output : output.substring(0, dotIndex);
                 return Integer.parseInt(versionString);
             }
         } catch (Exception e) {

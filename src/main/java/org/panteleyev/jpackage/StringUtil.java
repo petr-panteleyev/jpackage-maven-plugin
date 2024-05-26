@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
@@ -24,10 +24,10 @@ final class StringUtil {
     }
 
     static boolean isNotEmpty(String s) {
-        return s != null && s.trim().length() > 0;
+        return s != null && !s.trim().isEmpty();
     }
 
     static boolean isEmpty(String s) {
-        return s == null || s.trim().length() == 0;
+        return s == null || s.trim().isEmpty();
     }
 }
