@@ -47,6 +47,28 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>1.6.4</version>
+
+                        <configuration>
+                            <type>APP_IMAGE</type>
+                            <icon>icons/icon.png</icon>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
@@ -77,7 +99,7 @@
 </project>
 ```
 
-With above execution configuration the following command lines can be used regardles of the platform:
+With above execution configuration the following command lines can be used regardless of the platform:
 
 ```
 mvn clean package jpackage:jpackage

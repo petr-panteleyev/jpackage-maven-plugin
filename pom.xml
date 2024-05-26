@@ -187,8 +187,22 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
+                <artifactId>maven-plugin-report-plugin</artifactId>
                 <version>${mavenPluginPluginVersion}</version>
+                <configuration>
+                    <requirementsHistories>
+                        <requirementsHistory>
+                            <version>2.0.0</version>
+                            <maven>4.0.0</maven>
+                            <jdk>17</jdk>
+                        </requirementsHistory>
+                        <requirementsHistory>
+                            <version>1.6.4</version>
+                            <maven>3.9.7</maven>
+                            <jdk>8</jdk>
+                        </requirementsHistory>
+                    </requirementsHistories>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -206,11 +220,4 @@
             </plugin>
         </plugins>
     </reporting>
-    <repositories>
-        <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-        </repository>
-    </repositories>
 </project>

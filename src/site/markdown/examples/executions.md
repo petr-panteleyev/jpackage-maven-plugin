@@ -4,7 +4,7 @@
 <plugin>
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.4.0</version>
+    <version>1.6.4</version>
 
     <configuration>
         <name>Application Name</name>
@@ -35,6 +35,13 @@
                 <winMenu>true</winMenu>
             </configuration>
         </execution>
+        <execution>
+            <id>linux</id>
+            <configuration>
+              <type>APP_IMAGE</type>
+              <icon>icons/icon.png</icon>
+            </configuration>
+        </execution>
     </executions>
 </plugin>
 ```
@@ -49,4 +56,9 @@ With above execution configuration the following command lines can be used:
 * for Windows package: 
     ```
     mvn clean package jpackage:jpackage@win
+    ```
+
+* for Linux package: 
+    ```
+    mvn clean package jpackage:jpackage@linux
     ```

@@ -1,7 +1,7 @@
 ## Usage
 
 For detailed information about ```jpackage``` please refer to
-[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/19/jpackage/packaging-tool-user-guide.pdf).
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/22/jpackage/packaging-tool-user-guide.pdf).
 
 ### Finding jpackage
 
