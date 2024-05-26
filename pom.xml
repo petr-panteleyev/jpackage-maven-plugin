@@ -6,7 +6,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -40,19 +40,19 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <!-- Dependencies -->
-        <mavenProjectVersion>2.2.1</mavenProjectVersion>
-        <mavenCoreVersion>3.9.6</mavenCoreVersion>
-        <mavenPluginApiVersion>3.9.6</mavenPluginApiVersion>
-        <jUnitVersion>5.9.1</jUnitVersion>
+        <mavenCoreVersion>3.9.7</mavenCoreVersion>
+        <mavenPluginApiVersion>3.9.7</mavenPluginApiVersion>
+        <mavenSharedUtilsVersion>3.4.2</mavenSharedUtilsVersion>
+        <jUnitVersion>5.10.2</jUnitVersion>
         <!-- Plugins -->
-        <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
-        <mavenPluginPluginVersion>3.6.0</mavenPluginPluginVersion>
+        <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
+        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
+        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
+        <mavenPluginPluginVersion>3.13.0</mavenPluginPluginVersion>
         <mavenSitePluginVersion>3.12.1</mavenSitePluginVersion>
-        <mavenProjectInfoReportsPluginVersion>3.0.0</mavenProjectInfoReportsPluginVersion>
-        <mavenSourcePluginVersion>3.2.0</mavenSourcePluginVersion>
-        <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
+        <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
+        <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
+        <mavenGpgPluginVersion>3.2.4</mavenGpgPluginVersion>
         <nexusStagingMavenPlugin>1.6.8</nexusStagingMavenPlugin>
     </properties>
 
@@ -61,11 +61,13 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>${mavenCoreVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${mavenPluginApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
@@ -74,10 +76,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>${mavenProjectVersion}</version>
-            <scope>provided</scope>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-shared-utils</artifactId>
+            <version>${mavenSharedUtilsVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -185,8 +186,17 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
+                <artifactId>maven-plugin-report-plugin</artifactId>
                 <version>${mavenPluginPluginVersion}</version>
+                <configuration>
+                    <requirementsHistories>
+                        <requirementsHistory>
+                            <version>1.6.4</version>
+                            <maven>3.9.7</maven>
+                            <jdk>8</jdk>
+                        </requirementsHistory>
+                    </requirementsHistories>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -204,4 +214,11 @@
             </plugin>
         </plugins>
     </reporting>
+    <repositories>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+    </repositories>
 </project>

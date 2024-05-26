@@ -28,6 +28,7 @@ you can take a look into the following examples:
 
 ### jpackage Documentation
 
+* 22: https://docs.oracle.com/en/java/javase/22/docs/specs/man/jpackage.html
 * 21: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jpackage.html
 * 20: https://docs.oracle.com/en/java/javase/20/docs/specs/man/jpackage.html
 * 19: https://docs.oracle.com/en/java/javase/19/docs/specs/man/jpackage.html
