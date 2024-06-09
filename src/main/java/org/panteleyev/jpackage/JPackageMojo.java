@@ -89,6 +89,7 @@ import static org.panteleyev.jpackage.OsUtil.isWindows;
 import static org.panteleyev.jpackage.StringUtil.escape;
 import static org.panteleyev.jpackage.StringUtil.isEmpty;
 import static org.panteleyev.jpackage.StringUtil.isNotEmpty;
+import static org.panteleyev.jpackage.StringUtil.parseVersion;
 
 /**
  * <p>Generates application package.</p>
@@ -1056,10 +1057,7 @@ public class JPackageMojo extends AbstractMojo {
             if (exitCode != 0) {
                 return 0;
             } else {
-                var output = isEmpty(out.getOutput()) ? "0" : out.getOutput().trim();
-                var dotIndex = output.indexOf(".");
-                var versionString = dotIndex == -1 ? output : output.substring(0, dotIndex);
-                return Integer.parseInt(versionString);
+                return parseVersion(out.getOutput());
             }
         } catch (Exception e) {
             return 0;

@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
@@ -36,12 +36,31 @@ public class TestStringUtil {
                             "\"-XX:OnError=\\\"userdump.exe %p\\\"\"")
             );
         }
+    }
 
+    private static List<Arguments> testParseVersionArguments() {
+        return Arrays.asList(
+                Arguments.of(null, 0),
+                Arguments.of("", 0),
+                Arguments.of("  ", 0),
+                Arguments.of("22", 22),
+                Arguments.of("22.0.1", 22),
+                Arguments.of("23-ea", 23),
+                Arguments.of("23ea", 23),
+                Arguments.of("  23 ", 23),
+                Arguments.of("a22", 0)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("dataProvider")
     public void testEscape(String arg, String expected) {
         assertEquals(expected, escape(arg));
+    }
+
+    @ParameterizedTest
+    @MethodSource("testParseVersionArguments")
+    public void testParseVersion(String versionString, int expected) {
+        assertEquals(expected, StringUtil.parseVersion(versionString));
     }
 }
