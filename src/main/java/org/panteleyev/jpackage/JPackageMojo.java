@@ -1,7 +1,6 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
+// SPDX-License-Identifier: BSD-2-Clause
+
 package org.panteleyev.jpackage;
 
 import org.apache.maven.execution.MavenSession;
@@ -19,6 +18,7 @@ import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,13 +81,15 @@ import static org.panteleyev.jpackage.CommandLineParameter.WIN_SHORTCUT;
 import static org.panteleyev.jpackage.CommandLineParameter.WIN_SHORTCUT_PROMPT;
 import static org.panteleyev.jpackage.CommandLineParameter.WIN_UPDATE_URL;
 import static org.panteleyev.jpackage.CommandLineParameter.WIN_UPGRADE_UUID;
-import static org.panteleyev.jpackage.OsUtil.isLinux;
-import static org.panteleyev.jpackage.OsUtil.isMac;
-import static org.panteleyev.jpackage.OsUtil.isWindows;
-import static org.panteleyev.jpackage.StringUtil.escape;
-import static org.panteleyev.jpackage.StringUtil.isEmpty;
-import static org.panteleyev.jpackage.StringUtil.isNotEmpty;
-import static org.panteleyev.jpackage.StringUtil.parseVersion;
+import static org.panteleyev.jpackage.util.DirectoryUtil.isNestedDirectory;
+import static org.panteleyev.jpackage.util.DirectoryUtil.removeDirectory;
+import static org.panteleyev.jpackage.util.OsUtil.isLinux;
+import static org.panteleyev.jpackage.util.OsUtil.isMac;
+import static org.panteleyev.jpackage.util.OsUtil.isWindows;
+import static org.panteleyev.jpackage.util.StringUtil.escape;
+import static org.panteleyev.jpackage.util.StringUtil.isEmpty;
+import static org.panteleyev.jpackage.util.StringUtil.isNotEmpty;
+import static org.panteleyev.jpackage.util.StringUtil.parseVersion;
 
 /**
  * <p>Generates application package.</p>
@@ -109,6 +111,9 @@ public class JPackageMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
+
+    @Parameter(defaultValue = "${project.build.directory}", readonly = true)
+    private String projectBuildDirectory;
 
     /**
      * Skips plugin execution.
@@ -429,6 +434,18 @@ public class JPackageMojo extends AbstractMojo {
     @Parameter
     private boolean launcherAsService;
 
+    /**
+     * <p>Remove destination directory.</p>
+     * <p><code>jpackage</code> utility fails if generated binary already exists. In order to work around this behaviour
+     * there is plugin boolean option <code>removeDestination</code>. If <code>true</code> plugin will try to delete
+     * directory specified by <code>destination</code>. This might be useful to relaunch <code>jpackage</code> task
+     * without rebuilding an entire project.</p>
+     * <p>For safety reasons plugin will not process <code>removeDestination</code> if <code>destination</code> points
+     * to a location outside of <code>${project.build.directory}</code>.</p>
+     */
+    @Parameter
+    private boolean removeDestination;
+
     // Windows specific parameters
 
     /**
@@ -704,12 +721,23 @@ public class JPackageMojo extends AbstractMojo {
         boolean dryRun = "true".equalsIgnoreCase(System.getProperty(DRY_RUN_PROPERTY, "false"));
         if (dryRun) {
             getLog().warn("Dry-run mode, not executing " + EXECUTABLE);
-        } else {
-            try {
-                execute(commandLine);
-            } catch (Exception ex) {
-                throw new MojoExecutionException(ex.getMessage(), ex);
+            return;
+        }
+
+        if (removeDestination && destination != null) {
+            Path destinationPath = destination.toPath().toAbsolutePath();
+            if (!isNestedDirectory(new File(projectBuildDirectory).toPath(), destinationPath)) {
+                getLog().error("Cannot remove destination folder, must belong to " +  projectBuildDirectory);
+            } else {
+                getLog().warn("Trying to remove destination " + destinationPath);
+                removeDirectory(destinationPath);
             }
+        }
+
+        try {
+            execute(commandLine);
+        } catch (Exception ex) {
+            throw new MojoExecutionException(ex.getMessage(), ex);
         }
     }
 

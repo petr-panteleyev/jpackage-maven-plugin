@@ -1,22 +1,21 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
-package org.panteleyev.jpackage;
+// Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
+// SPDX-License-Identifier: BSD-2-Clause
+
+package org.panteleyev.jpackage.util;
 
 import java.util.regex.Matcher;
 
 import static java.lang.Character.isDigit;
-import static org.panteleyev.jpackage.OsUtil.isWindows;
+import static org.panteleyev.jpackage.util.OsUtil.isWindows;
 
-final class StringUtil {
+public final class StringUtil {
     private StringUtil() {
     }
 
     private static final String REPLACER = Matcher.quoteReplacement(isWindows() ? "\\\\\\\"" : "\\\"");
     private static final String SPACE_WRAPPER = isWindows() ? "\\\"" : "\"";
 
-    static String escape(String arg) {
+    public static String escape(String arg) {
         arg = arg.replaceAll("\"", REPLACER);
         if (arg.contains(" ")) {
             arg = SPACE_WRAPPER + arg + SPACE_WRAPPER;
@@ -25,15 +24,15 @@ final class StringUtil {
         return arg;
     }
 
-    static boolean isNotEmpty(String s) {
+    public static boolean isNotEmpty(String s) {
         return s != null && !s.trim().isEmpty();
     }
 
-    static boolean isEmpty(String s) {
+    public static boolean isEmpty(String s) {
         return s == null || s.trim().isEmpty();
     }
 
-    static int parseVersion(String versionString) {
+    public static int parseVersion(String versionString) {
         if (versionString == null) {
             return 0;
         }

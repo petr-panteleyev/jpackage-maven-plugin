@@ -1,8 +1,7 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
-package org.panteleyev.jpackage;
+// Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
+// SPDX-License-Identifier: BSD-2-Clause
+
+package org.panteleyev.jpackage.util;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.panteleyev.jpackage.OsUtil.isWindows;
-import static org.panteleyev.jpackage.StringUtil.escape;
+import static org.panteleyev.jpackage.util.OsUtil.isWindows;
+import static org.panteleyev.jpackage.util.StringUtil.escape;
 
 public class TestStringUtil {
 

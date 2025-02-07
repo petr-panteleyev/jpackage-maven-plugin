@@ -8,7 +8,7 @@
 <suite name="Money Manager Application Unit Tests">
     <test name="Mojo">
         <classes>
-            <class name="org.panteleyev.jpackage.TestStringUtil"/>
+            <class name="org.panteleyev.jpackage.util.TestStringUtil"/>
         </classes>
     </test>
 </suite>

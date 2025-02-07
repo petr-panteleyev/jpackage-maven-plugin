@@ -71,6 +71,15 @@ _Example:_
 </javaOptions>
 ``` 
 
+### Destination Directory
+
+```jpackage``` utility fails if generated binary already exists. In order to work around this behaviour there is plugin
+boolean option ```removeDestination```. If ```true``` plugin will try to delete directory specified by ```destination```.
+This might be useful to relaunch ```jpackage``` task without rebuilding an entire project.
+
+For safety reasons plugin will not process ```removeDestination``` if ```destination``` points to a location outside of
+```${project.build.directory}```.
+
 #### Default Command-Line Arguments
 
 Default command line arguments are passed to the main class when the application is started without providing arguments.
