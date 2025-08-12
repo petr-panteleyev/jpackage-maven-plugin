@@ -54,6 +54,8 @@
         <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>3.2.4</mavenGpgPluginVersion>
         <nexusStagingMavenPlugin>1.6.8</nexusStagingMavenPlugin>
+        <!-- Disable GPG signing for CI builds -->
+        <gpg.skip>false</gpg.skip>
     </properties>
 
     <dependencies>
@@ -158,6 +160,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>${mavenGpgPluginVersion}</version>
+                <configuration>
+                    <skip>${gpg.skip}</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -221,4 +226,13 @@
             <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
+
+    <profiles>
+        <profile>
+            <id>skip-gpg</id>
+            <properties>
+                <gpg.skip>true</gpg.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
