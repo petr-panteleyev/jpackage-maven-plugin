@@ -16,11 +16,14 @@ import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
+import org.panteleyev.jpackage.util.StringUtil;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.panteleyev.jpackage.CommandLineParameter.ABOUT_URL;
 import static org.panteleyev.jpackage.CommandLineParameter.ADD_LAUNCHER;
@@ -165,6 +168,12 @@ public class JPackageMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${project.version}")
     private String appVersion;
+
+    /**
+     * Normalize the application version for jpackage to meet numeric-only requirements.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean normalizeAppVersion;
 
     /**
      * --vendor &lt;vendor string>
@@ -694,6 +703,10 @@ public class JPackageMojo extends AbstractMojo {
     @Parameter
     private boolean linuxShortcut;
 
+    private static final Pattern JP_VERSION_INVALID =
+            Pattern.compile("Version \\[[^]]+] contains invalid component \\[[^]]+]", Pattern.DOTALL);
+
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
             getLog().info("Skipping plugin execution");
@@ -736,6 +749,36 @@ public class JPackageMojo extends AbstractMojo {
 
         try {
             execute(commandLine);
+        } catch (MojoExecutionException ex) {
+            String text = ex.getMessage();
+            if (text == null && ex.getCause() != null) {
+                text = ex.getCause().getMessage();
+            }
+
+            boolean isVersionError = (text != null) && JP_VERSION_INVALID.matcher(text).find();
+
+            if (isVersionError && appVersion != null && (appVersion.contains("-") || appVersion.contains("+"))) {
+                String msg;
+                try {
+                    String normalizedExample = StringUtil.normalizeVersion(appVersion);
+                    msg = text +
+                            "\n\njpackage --app-version accepts only numeric components: X[.Y[.Z[.W]]]" +
+                            "\nYour current appVersion '" + appVersion + "' contains pre-release or build metadata." +
+                            "\nTo fix this, enable <normalizeAppVersion>true</normalizeAppVersion> in your plugin configuration," +
+                            "\nor specify a numeric-only version explicitly." +
+                            "\nExample normalization: " + appVersion + "  ->  " + normalizedExample;
+                } catch (IllegalArgumentException e) {
+                    msg = text +
+                            "\n\njpackage --app-version accepts only numeric components: X[.Y[.Z[.W]]]" +
+                            "\nYour current appVersion '" + appVersion + "' is not in a valid numeric format." +
+                            "\nError details: " + e.getMessage() +
+                            "\nPlease specify a valid numeric-only version such as '1.0.0' or '2.3.4.5'.";
+                }
+
+                throw new MojoExecutionException(msg, ex);
+            }
+
+            throw ex;
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
@@ -819,6 +862,15 @@ public class JPackageMojo extends AbstractMojo {
     }
 
     private Commandline buildParameters(int version) throws MojoFailureException {
+        String actualAppVersion = appVersion;
+        if (normalizeAppVersion && appVersion != null) {
+            actualAppVersion = StringUtil.normalizeVersion(appVersion);
+            if (type == ImageType.EXE || type == ImageType.MSI || type == ImageType.APP_IMAGE) {
+                actualAppVersion = StringUtil.sanitizeForWindows(actualAppVersion);
+            }
+            getLog().info("Normalized appVersion for jpackage: " + appVersion + " -> " + actualAppVersion);
+        }
+
         getLog().info("jpackage options:");
 
         Commandline commandline = new Commandline();
@@ -826,7 +878,7 @@ public class JPackageMojo extends AbstractMojo {
         addMandatoryParameter(commandline, DESTINATION, destination, false, version);
         addParameter(commandline, VERBOSE, verbose, version);
         addParameter(commandline, TYPE, type, version);
-        addParameter(commandline, APP_VERSION, appVersion, version);
+        addParameter(commandline, APP_VERSION, actualAppVersion, version);
         addParameter(commandline, COPYRIGHT, copyright, version);
         addParameter(commandline, DESCRIPTION, description, version);
         addParameter(commandline, RUNTIME_IMAGE, runtimeImage, true, version);
