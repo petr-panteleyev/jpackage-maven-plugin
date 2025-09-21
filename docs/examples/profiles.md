@@ -1,4 +1,4 @@
-## Configuration with profiles
+# Configuration with Profiles
 
 ```xml
 
@@ -16,10 +16,9 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
-                            <icon>icons/icons.ico</icon>
+                            <icon>${project.basedir}/icons/icons.ico</icon>
                             <winMenu>true</winMenu>
                         </configuration>
                     </plugin>
@@ -38,10 +37,9 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
-                            <icon>icons/icons.icns</icon>
+                            <icon>${project.basedir}/icons/icons.icns</icon>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -59,11 +57,10 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
                             <type>APP_IMAGE</type>
-                            <icon>icons/icon.png</icon>
+                            <icon>${project.basedir}/icons/icon.png</icon>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -76,7 +73,6 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
-                <version>1.6.4</version>
 
                 <!-- Common part of configuration -->
                 <configuration>
@@ -85,9 +81,9 @@
                     <vendor>app.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
                     <modulePaths>
-                        <modulePath>target/mods</modulePath>
+                        <modulePath>${project.basedir}/target/jmods</modulePath>
                     </modulePaths>
-                    <destination>target/dist</destination>
+                    <destination>${project.basedir}/target/dist</destination>
                     <javaOptions>
                         <option>--enable-preview</option>
                         <option>-Dfile.encoding=UTF-8</option>

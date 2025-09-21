@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
+<!--
+  Copyright © 2020-2025 Petr Panteleyev
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.6.6</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -37,43 +40,47 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <!-- Dependencies -->
-        <mavenCoreVersion>3.9.7</mavenCoreVersion>
-        <mavenPluginApiVersion>3.9.7</mavenPluginApiVersion>
+        <mavenVersion>4.0.0-rc-4</mavenVersion>
         <mavenSharedUtilsVersion>3.4.2</mavenSharedUtilsVersion>
-        <jUnitVersion>5.11.4</jUnitVersion>
+        <jUnitVersion>5.12.1</jUnitVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
-        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
-        <mavenPluginPluginVersion>3.13.0</mavenPluginPluginVersion>
-        <mavenSitePluginVersion>3.12.1</mavenSitePluginVersion>
-        <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
+        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
+        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
+        <mavenPluginPluginVersion>4.0.0-beta-1</mavenPluginPluginVersion>
         <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
-        <mavenGpgPluginVersion>3.2.4</mavenGpgPluginVersion>
-        <nexusStagingMavenPlugin>1.6.8</nexusStagingMavenPlugin>
+        <mavenGpgPluginVersion>3.2.8</mavenGpgPluginVersion>
+        <nexusStagingMavenPlugin>0.7.0</nexusStagingMavenPlugin>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${mavenCoreVersion}</version>
+            <artifactId>maven-api-core</artifactId>
+            <version>${mavenVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${mavenPluginApiVersion}</version>
+            <artifactId>maven-api-plugin</artifactId>
+            <version>${mavenVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>${mavenPluginPluginVersion}</version>
-            <optional>true</optional>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-api-model</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-api-di</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -104,10 +111,15 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>${maven.compiler.target}</version>
+                            <version>${maven.compiler.release}</version>
                         </jdk>
                     </toolchains>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${mavenResourcePluginVersion}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -116,13 +128,13 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${mavenSurefirePluginVersion}</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${mavenJarPluginVersion}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>${mavenSitePluginVersion}</version>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${mavenSurefirePluginVersion}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -169,51 +181,19 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
                 <version>${nexusStagingMavenPlugin}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-report-plugin</artifactId>
-                <version>${mavenPluginPluginVersion}</version>
-                <configuration>
-                    <requirementsHistories>
-                        <requirementsHistory>
-                            <version>1.6.4</version>
-                            <maven>3.9.7</maven>
-                            <jdk>8</jdk>
-                        </requirementsHistory>
-                    </requirementsHistories>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>${mavenProjectInfoReportsPluginVersion}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>summary</report>
-                            <report>dependencies</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
     <repositories>
         <repository>
             <id>maven_central</id>

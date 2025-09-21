@@ -1,10 +1,9 @@
-## Configuration with executions
+# Configuration with Executions
 
 ```xml
 <plugin>
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.6.4</version>
 
     <configuration>
         <name>Application Name</name>
@@ -12,9 +11,9 @@
         <vendor>app.org</vendor>
         <module>${appModule}/${appMainClass}</module>
         <modulePaths>
-            <modulePath>target/mods</modulePath>
+            <modulePath>${project.basedir}/target/mods</modulePath>
         </modulePaths>
-        <destination>target/dist</destination>
+        <destination>${project.basedir}/target/dist</destination>
         <javaOptions>
             <option>--enable-preview</option>
             <option>-Dfile.encoding=UTF-8</option>
@@ -25,13 +24,13 @@
         <execution>
             <id>mac</id>
             <configuration>
-                <icon>icons/icons.icns</icon>
+                <icon>${project.basedir}/icons/icons.icns</icon>
             </configuration>
         </execution>
         <execution>
             <id>win</id>
             <configuration>
-                <icon>icons/icon.ico</icon>
+                <icon>${project.basedir}/icons/icon.ico</icon>
                 <winMenu>true</winMenu>
             </configuration>
         </execution>
@@ -39,7 +38,7 @@
             <id>linux</id>
             <configuration>
               <type>APP_IMAGE</type>
-              <icon>icons/icon.png</icon>
+              <icon>${project.basedir}/icons/icon.png</icon>
             </configuration>
         </execution>
     </executions>

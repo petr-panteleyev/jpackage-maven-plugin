@@ -1,15 +1,17 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.jpackage;
 
-import org.apache.maven.plugin.MojoFailureException;
-import java.io.File;
+import org.apache.maven.api.plugin.MojoException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Launcher {
     private String name;
-    private File file;
+    private Path file;
 
     public String getName() {
         return name;
@@ -19,21 +21,21 @@ public class Launcher {
         this.name = name;
     }
 
-    public File getFile() {
+    public Path getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    public void setFile(Path file) {
         this.file = file;
     }
 
-    public void validate() throws MojoFailureException {
+    public void validate() {
         if (name == null || name.isEmpty() || file == null) {
-            throw new MojoFailureException("Launcher parameters cannot be null or empty");
+            throw new MojoException("Launcher parameters cannot be null or empty");
         }
 
-        if (!file.exists()) {
-            throw new MojoFailureException("Launcher file " + file.getAbsolutePath() + " does not exist");
+        if (!Files.exists(file)) {
+            throw new MojoException("Launcher file " + file.toAbsolutePath() + " does not exist");
         }
     }
 }
