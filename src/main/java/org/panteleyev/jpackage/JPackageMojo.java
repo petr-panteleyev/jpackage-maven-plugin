@@ -359,6 +359,9 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
 
     /**
      * <p>--add-modules &lt;module>[,&lt;module>]</p>
+     * <p>This module list, along with the main module (if specified) will be passed to <code>jlink</code> as the
+     * --add-module argument. If not specified, either just the main module (if <code>module</code> is specified), or
+     * the default set of modules (if <code>mainJar</code> is specified) are used.</p>
      *
      * @since 14
      */
@@ -367,6 +370,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
 
     /**
      * <p>--app-image &lt;path to application image></p>
+     * <p>Location of the predefined application image that is used to build an installable package (on all platforms)
+     * or to be signed (on macOS).</p>
      *
      * @since 14
      */
@@ -406,7 +411,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private List<String> jLinkOptions;
 
     /**
-     * --about-url &lt;url>
+     * <p>--about-url &lt;url></p>
+     * <p>URL of the application's home page.</p>
      *
      * @since 17
      */
