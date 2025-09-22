@@ -1,6 +1,6 @@
 # JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.java.net/jeps/343).
+Maven plugin for [jpackage](https://openjdk.org/jeps/392).
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
 [![Licence](https://img.shields.io/badge/Java-1.8-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
@@ -8,4 +8,4 @@ Maven plugin for [jpackage](https://openjdk.java.net/jeps/343).
 
 [Plugin Documentation](https://petr-panteleyev.github.io/jpackage-maven-plugin/)
 
-[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf)
+[Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-tool-user-guide.pdf)

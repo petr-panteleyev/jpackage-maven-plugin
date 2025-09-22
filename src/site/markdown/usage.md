@@ -39,7 +39,6 @@ The following plugin parameters define directory or file location:
 * destination
 * icon
 * input
-* installDir
 * resourceDir 
 * modulePath
 * runtimeImage
@@ -52,8 +51,6 @@ The following plugin parameters define directory or file location:
 * macDmgContentPath
  
 If path is not absolute is will be resolved as relative to ```${project.basedir}```.
-
-One exception is ```installDir``` which is passed as is.
 
 #### Java Options
 

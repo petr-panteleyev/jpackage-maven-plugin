@@ -1,6 +1,6 @@
 ## JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.java.net/jeps/343).
+Maven plugin for [jpackage](https://openjdk.org/jeps/392).
 
 ### Goals Overview
 
@@ -26,14 +26,8 @@ you can take a look into the following examples:
 * [Configuration via executions](./examples/executions.html)
 * [Configuration via profiles](./examples/profiles.html)
 
-### jpackage Documentation
+## Packaging Tool User's Guide
 
-* 22: https://docs.oracle.com/en/java/javase/22/docs/specs/man/jpackage.html
-* 21: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jpackage.html
-* 20: https://docs.oracle.com/en/java/javase/20/docs/specs/man/jpackage.html
-* 19: https://docs.oracle.com/en/java/javase/19/docs/specs/man/jpackage.html
-* 18: https://docs.oracle.com/en/java/javase/18/docs/specs/man/jpackage.html
-* 17: https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html
-* 16: https://docs.oracle.com/en/java/javase/16/docs/specs/man/jpackage.html
-* 15: https://docs.oracle.com/en/java/javase/15/docs/specs/man/jpackage.html
-* 14: https://docs.oracle.com/en/java/javase/14/docs/specs/man/jpackage.html
+* [Release 25](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-tool-user-guide.pdf)
+* [Release 21](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf)
+* [Release 17](https://docs.oracle.com/en/java/javase/17/jpackage/packaging-tool-user-guide.pdf)
