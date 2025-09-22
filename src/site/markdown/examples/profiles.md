@@ -1,4 +1,4 @@
-# Configuration with Profiles
+## Configuration with profiles
 
 ```xml
 
@@ -81,7 +81,7 @@
                     <vendor>app.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
                     <modulePaths>
-                        <modulePath>${project.basedir}/target/jmods</modulePath>
+                        <modulePath>${project.basedir}/target/mods</modulePath>
                     </modulePaths>
                     <destination>${project.basedir}/target/dist</destination>
                     <javaOptions>

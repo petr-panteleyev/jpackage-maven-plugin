@@ -1,4 +1,4 @@
-# Configuration with Executions
+## Configuration with executions
 
 ```xml
 <plugin>

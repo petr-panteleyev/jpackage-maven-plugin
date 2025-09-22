@@ -1,4 +1,9 @@
-# Using Maven Dependency Plugin
+# Collecting JAR Files
+
+This example shows how to collect all required JAR files using Maven Dependency Plugin.
+
+All dependencies are placed into the same directory ```${project.basedir}/target/mods``` together with the main 
+application jar.
 
 ```xml
 
@@ -7,7 +12,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-            <outputDirectory>${project.basedir}/target/jmods</outputDirectory>
+            <outputDirectory>${project.basedir}/target/mods</outputDirectory>
         </configuration>
     </plugin>
 
@@ -23,7 +28,7 @@
                 </goals>
                 <configuration>
                     <includeScope>runtime</includeScope>
-                    <outputDirectory>${project.basedir}/target/jmods</outputDirectory>
+                    <outputDirectory>${project.basedir}/target/mods</outputDirectory>
                 </configuration>
             </execution>
         </executions>
@@ -34,7 +39,7 @@
         <artifactId>jpackage-maven-plugin</artifactId>
         <configuration>
             <modulePaths>
-                <modulePath>${project.basedir}/target/jmods</modulePath>
+                <modulePath>${project.basedir}/target/mods</modulePath>
             </modulePaths>
         </configuration>
     </plugin>

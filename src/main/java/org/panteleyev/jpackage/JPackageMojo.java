@@ -110,190 +110,564 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private Path projectBuildDirectory;
 
+    /**
+     * Skips plugin execution.
+     */
     @Parameter(defaultValue = "false")
     private boolean skip;
 
+    /**
+     * --verbose
+     *
+     * @since 14
+     */
     @Parameter
     private boolean verbose;
 
+    /**
+     * <p>--type &lt;type></p>
+     *
+     * <p>Possible values:</p>
+     * <table>
+     *     <tr>
+     *         <th>Plugin</th><th>JPackage</th>
+     *     </tr>
+     *     <tr><td>APP_IMAGE</td><td>app-image</td></tr>
+     *     <tr><td>DMG</td><td>dmg</td></tr>
+     *     <tr><td>PKG</td><td>pkg</td></tr>
+     *     <tr><td>EXE</td><td>exe</td></tr>
+     *     <tr><td>MSI</td><td>msi</td></tr>
+     *     <tr><td>DEB</td><td>deb</td></tr>
+     * </table>
+     *
+     * @since 14
+     */
     @Parameter
     private ImageType type;
 
-    @Parameter(defaultValue = "${project.name}")
+    /**
+     * --name &lt;name>
+     *
+     * @since 14
+     */
+    @Parameter(defaultValue = "${project.name}", required = true)
     private String name;
 
+    /**
+     * --app-version &lt;version>
+     *
+     * @since 14
+     */
     @Parameter(defaultValue = "${project.version}")
     private String appVersion;
 
+    /**
+     * --vendor &lt;vendor string>
+     *
+     * @since 14
+     */
     @Parameter
     private String vendor;
 
+    /**
+     * --icon &lt;icon file path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path icon;
 
+    /**
+     * --runtime-image &lt;file path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path runtimeImage;
 
+    /**
+     * --input &lt;input path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path input;
 
+    /**
+     * --install-dir &lt;dir path>
+     *
+     * @since 14
+     */
     @Parameter
     private String installDir;
 
+    /**
+     * --resource-dir &lt;resource dir path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path resourceDir;
 
-    @Parameter
+    /**
+     * --dest &lt;destination path>
+     *
+     * @since 14
+     */
+    @Parameter(required = true)
     private Path destination;
 
+    /**
+     * --module &lt;module name>[/&lt;main class>]
+     *
+     * @since 14
+     */
     @Parameter
     private String module;
 
+    /**
+     * --main-class &lt;class name>
+     *
+     * @since 14
+     */
     @Parameter
     private String mainClass;
 
+    /**
+     * --main-jar &lt;main jar file>
+     *
+     * @since 14
+     */
     @Parameter
     private String mainJar;
 
+    /**
+     * --temp &lt;temp dir path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path temp;
 
+    /**
+     * --copyright &lt;copyright string>
+     *
+     * @since 14
+     */
     @Parameter
     private String copyright;
 
+    /**
+     * --description &lt;description string>
+     *
+     * @since 14
+     */
     @Parameter
     private String description;
 
+    /**
+     * <p>Each module path is specified by a separate &lt;modulePath> parameter.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;modulePaths>
+     *     &lt;modulePath>target/modules&lt;/modulePath>
+     * &lt;/modulePaths>
+     * </pre>
+     * </p>
+     *
+     * @since 14
+     */
     @Parameter
     private List<Path> modulePaths;
 
+    /**
+     * --java-options &lt;JVM option>
+     *
+     * @since 14
+     */
     @Parameter
     private List<String> javaOptions;
 
+    /**
+     * --arguments &lt;main class arguments>
+     *
+     * @since 14
+     */
     @Parameter
     private List<String> arguments;
 
+    /**
+     * --license-file &lt;license file path>
+     *
+     * @since 14
+     */
     @Parameter
     private Path licenseFile;
 
+    /**
+     * <p>--file-associations &lt;file association property file></p>
+     *
+     * <p>Each property file is specified by a separate &lt;fileAssociation> parameter.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;fileAssociations>
+     *     &lt;fileAssociation>src/properties/java.properties&lt;/fileAssociation>
+     *     &lt;fileAssociation>src/properties/cpp.properties&lt;/fileAssociation>
+     * &lt;/fileAssociations>
+     * </pre>
+     * </p>
+     *
+     * @since 14
+     */
     @Parameter
     private List<Path> fileAssociations;
 
+    /**
+     * <p>--add-launcher &lt;name>=&lt;file></p>
+     *
+     * <p>Application launchers specified by one</p>
+     * <pre>
+     * &lt;launcher>
+     *     &lt;name>name-of-the-launcher&lt;/name>
+     *     &lt;file>/path/to/launcher.properties&lt;/file>
+     * &lt;/launcher>
+     * </pre>
+     *
+     * <p>element for each launcher.</p>
+     *
+     * @since 14
+     */
     @Parameter
     private List<Launcher> launchers;
 
+    /**
+     * <p>--add-modules &lt;module>[,&lt;module>]</p>
+     *
+     * @since 14
+     */
     @Parameter
     private List<String> addModules;
 
+    /**
+     * <p>--app-image &lt;path to application image></p>
+     *
+     * @since 14
+     */
     @Parameter
     private Path appImage;
 
+    /**
+     * <p>Additional jpackage options not covered by dedicated plugin parameters.</p>
+     *
+     * <p>Example:
+     * <pre>
+     * &lt;additionalOptions>
+     *     &lt;option>--jlink-options&lt;/option>
+     *     &lt;option>--bind-services&lt;/option>
+     * &lt;/additionalOptions>
+     * </pre>
+     * </p>
+     */
     @Parameter
     private List<String> additionalOptions;
 
+    /**
+     * <p>jlink options.</p>
+     *
+     * <p>Example:
+     * <pre>
+     * &lt;jLinkOptions>
+     *     &lt;jLinkOption>--strip-native-commands&lt;/jLinkOption>
+     *     &lt;jLinkOption>--strip-debug&lt;/jLinkOption>
+     * &lt;/jLinkOptions>
+     * </pre>
+     * </p>
+     *
+     * @since 16
+     */
     @Parameter
     private List<String> jLinkOptions;
 
+    /**
+     * --about-url &lt;url>
+     *
+     * @since 17
+     */
     @Parameter
     private String aboutUrl;
 
+    /**
+     * <p>--app-content additional-content[,additional-content...]</p>
+     * <p>Example:
+     * <pre>
+     * &lt;appContentPaths>
+     *     &lt;appContentPath>./docs&lt;/appContentPath>
+     *     &lt;appContentPath>./images&lt;/appContentPath>
+     * &lt;/appContentPaths>
+     * </pre>
+     * </p>
+     *
+     * @since 18
+     */
     @Parameter
     private List<Path> appContentPaths;
 
+    /**
+     * --launcher-as-service
+     *
+     * @since 19
+     */
     @Parameter
     private boolean launcherAsService;
 
+    /**
+     * <p>Remove destination directory.</p>
+     * <p><code>jpackage</code> utility fails if generated binary already exists. In order to work around this behaviour
+     * there is plugin boolean option <code>removeDestination</code>. If <code>true</code> plugin will try to delete
+     * directory specified by <code>destination</code>. This might be useful to relaunch <code>jpackage</code> task
+     * without rebuilding an entire project.</p>
+     * <p>For safety reasons plugin will not process <code>removeDestination</code> if <code>destination</code> points
+     * to a location outside of <code>${project.build.directory}</code>.</p>
+     */
     @Parameter
     private boolean removeDestination;
 
     // Windows specific parameters
 
+    /**
+     * --win-menu
+     *
+     * @since 14
+     */
     @Parameter
     private boolean winMenu;
 
+    /**
+     * --win-dir-chooser
+     *
+     * @since 14
+     */
     @Parameter
     private boolean winDirChooser;
 
+    /**
+     * --win-help-url &lt;url>
+     *
+     * @since 17
+     */
     @Parameter
     private String winHelpUrl;
 
+    /**
+     * --win-upgrade-uuid &lt;id string>
+     *
+     * @since 14
+     */
     @Parameter
     private String winUpgradeUuid;
 
+    /**
+     * --win-menu-group &lt;menu group name>
+     *
+     * @since 14
+     */
     @Parameter
     private String winMenuGroup;
 
+    /**
+     * --win-shortcut
+     *
+     * @since 14
+     */
     @Parameter
     private boolean winShortcut;
 
+    /**
+     * --win-shortcut-prompt
+     *
+     * @since 17
+     */
     @Parameter
     private boolean winShortcutPrompt;
 
+    /**
+     * --win-update-url &lt;url>
+     *
+     * @since 17
+     */
     @Parameter
     private String winUpdateUrl;
 
+    /**
+     * --win-per-user-install
+     *
+     * @since 14
+     */
     @Parameter
     private boolean winPerUserInstall;
 
+    /**
+     * --win-console
+     *
+     * @since 14
+     */
     @Parameter
     private boolean winConsole;
 
     // OS X specific parameters
 
+    /**
+     * --mac-package-identifier &lt;ID string>
+     *
+     * @since 14
+     */
     @Parameter
     private String macPackageIdentifier;
 
+    /**
+     * --mac-package-name &lt;name string>
+     *
+     * @since 14
+     */
     @Parameter
     private String macPackageName;
 
+    /**
+     * --mac-package-signing-prefix &lt;prefix string>
+     *
+     * @since 17
+     */
     @Parameter
     private String macPackageSigningPrefix;
 
+    /**
+     * --mac-sign
+     *
+     * @since 14
+     */
     @Parameter
     private boolean macSign;
 
+    /**
+     * --mac-signing-keychain &lt;file path>
+     *
+     * @since 14
+     */
     @Parameter
     private String macSigningKeychain;
 
+    /**
+     * --mac-signing-key-user-name &lt;team name>
+     *
+     * @since 14
+     */
     @Parameter
     private String macSigningKeyUserName;
 
+    /**
+     * --mac-app-store
+     *
+     * @since 17
+     */
     @Parameter
     private boolean macAppStore;
 
+    /**
+     * --mac-entitlements &lt;file path>
+     *
+     * @since 17
+     */
     @Parameter
     private Path macEntitlements;
 
+    /**
+     * --mac-app-category &lt;category string>
+     *
+     * @since 17
+     */
     @Parameter
     private String macAppCategory;
 
+    /**
+     * <p>--mac-dmg-content additional-content[,additional-content...]</p>
+     * <p>Example:
+     * <pre>
+     * &lt;macDmgContentPaths>
+     *     &lt;macDmgContentPath>./docs&lt;/macDmgContentPath>
+     *     &lt;macDmgContentPath>./images&lt;/macDmgContentPath>
+     * &lt;/macDmgContentPaths>
+     * </pre>
+     * </p>
+     *
+     * @since 18
+     */
     @Parameter
     private List<Path> macDmgContentPaths;
 
 
     // Linux specific parameters
 
+    /**
+     * --linux-package-name &lt;package name>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxPackageName;
 
+    /**
+     * --linux-deb-maintainer &lt;email address>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxDebMaintainer;
 
+    /**
+     * --linux-menu-group &lt;menu-group-name>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxMenuGroup;
 
+    /**
+     * --linux-package-deps
+     *
+     * @since 14
+     */
     @Parameter
     private boolean linuxPackageDeps;
 
+    /**
+     * --linux-rpm-license-type &lt;type string>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxRpmLicenseType;
 
+    /**
+     * --linux-app-release &lt;release value>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxAppRelease;
 
+    /**
+     * --linux-app-category &lt;category value>
+     *
+     * @since 14
+     */
     @Parameter
     private String linuxAppCategory;
 
+    /**
+     * --linux-shortcut
+     *
+     * @since 14
+     */
     @Parameter
     private boolean linuxShortcut;
 

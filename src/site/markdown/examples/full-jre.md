@@ -1,4 +1,4 @@
-# Application Image with Full JRE
+## Application image with full JRE
 
 ```xml
 <plugin>
@@ -12,7 +12,7 @@
         <runtimeImage>${java.home}</runtimeImage>
         <module>${appModule}/${appMainClass}</module>
         <modulePaths>
-            <modulePath>${project.basedir}/target/jmods</modulePath>
+            <modulePath>${project.basedir}/target/mods</modulePath>
         </modulePaths>
         <destination>${project.basedir}/target/dist</destination>
         <javaOptions>
