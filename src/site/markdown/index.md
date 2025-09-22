@@ -1,12 +1,12 @@
-## JPackage Maven Plugin
+# Introduction
 
 Maven plugin for [jpackage](https://openjdk.org/jeps/392).
 
-### Goals Overview
+## Goals Overview
 
 * [jpackage:jpackage](./jpackage-mojo.html) generates application package.
 
-### Usage
+## Usage
 
   General instructions on how to use the JPackage Maven Plugin can be found on the [usage page](./usage.md). Some more
   specific use cases are described in the examples given below.
@@ -17,7 +17,7 @@ Maven plugin for [jpackage](https://openjdk.org/jeps/392).
   can reproduce your problem. For this reason, entire debug logs, POMs or most preferably little demo projects attached
   to the issue are very much appreciated.
 
-### Examples
+## Examples
 
 To provide you with better understanding of some usages of the JPackage Maven Plugin,
 you can take a look into the following examples:
@@ -26,6 +26,7 @@ you can take a look into the following examples:
 * [Configuration via executions](./examples/executions.md)
 * [Configuration via profiles](./examples/profiles.md)
 * [Collecting jar files](./examples/collecting-components.md)
+* [Using jlink output](./examples/jlink.md)
 
 ## Packaging Tool User's Guide
 

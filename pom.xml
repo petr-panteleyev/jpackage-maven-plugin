@@ -49,10 +49,11 @@
         <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
+        <mavenJavadocPluginVersion>3.11.3</mavenJavadocPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
-        <mavenSitePluginVersion>3.12.1</mavenSitePluginVersion>
-        <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
+        <mavenSitePluginVersion>3.21.0</mavenSitePluginVersion>
+        <mavenProjectInfoReportsPluginVersion>3.9.0</mavenProjectInfoReportsPluginVersion>
         <mavenPluginPluginVersion>4.0.0-beta-1</mavenPluginPluginVersion>
         <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>3.2.8</mavenGpgPluginVersion>
@@ -127,6 +128,27 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${mavenJavadocPluginVersion}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <notimestamp>true</notimestamp>
+                            <author>false</author>
+                            <failOnError>false</failOnError>
+                            <doclint>none</doclint>
+                            <disableNoFonts>true</disableNoFonts>
+                            <release>${maven.compiler.release}</release>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -213,6 +235,11 @@
                             <version>2.0.0</version>
                             <maven>4.0.0</maven>
                             <jdk>17</jdk>
+                        </requirementsHistory>
+                        <requirementsHistory>
+                            <version>1.7.0</version>
+                            <maven>3.9.11</maven>
+                            <jdk>8</jdk>
                         </requirementsHistory>
                         <requirementsHistory>
                             <version>1.6.4</version>
