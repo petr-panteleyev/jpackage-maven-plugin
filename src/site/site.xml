@@ -22,6 +22,7 @@
             <item name="Configuration with executions" href="examples/executions.html"/>
             <item name="Configuration with profiles" href="examples/profiles.html"/>
             <item name="Collecting JAR files" href="examples/collecting-components.html"/>
+            <item name="Using jlink output" href="examples/jlink.html"/>
         </menu>
 
         <menu name="Project">

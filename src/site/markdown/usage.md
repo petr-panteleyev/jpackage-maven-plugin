@@ -26,13 +26,6 @@ Plugin determines OS name using ```os.name``` system property in order to config
 Generic parameters should be placed in the root plugin configuration. OS-specific parameters should be separated with
 [executions](./examples/executions.md) or [profiles](./examples/profiles.md).
 
-#### Mandatory Parameters
-
-To enable various configuration approaches mandatory parameters are validated during plugin execution:
-
-* name
-* destination
-
 #### Relative Path Resolution
 
 Parameters of type ```Path``` are resolved to absolute paths. To avoid unexpected results it is advised to supply

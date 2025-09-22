@@ -117,7 +117,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean skip;
 
     /**
-     * --verbose
+     * <p>--verbose</p>
+     * <p>Enables verbose output.</p>
      *
      * @since 14
      */
@@ -127,7 +128,7 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     /**
      * <p>--type &lt;type></p>
      *
-     * <p>Possible values:</p>
+     * <p>The type of package to create. Possible values:</p>
      * <table>
      *     <tr>
      *         <th>Plugin</th><th>JPackage</th>
@@ -146,7 +147,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private ImageType type;
 
     /**
-     * --name &lt;name>
+     * <p>--name &lt;name></p>
+     * <p>Name of the application and/or package.</p>
      *
      * @since 14
      */
@@ -154,7 +156,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String name;
 
     /**
-     * --app-version &lt;version>
+     * <p>--app-version &lt;version></p>
+     * <p> Version of the application and/or package.</p>
      *
      * @since 14
      */
@@ -162,7 +165,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String appVersion;
 
     /**
-     * --vendor &lt;vendor string>
+     * <p>--vendor &lt;vendor string></p>
+     * <p>Vendor of the application.</p>
      *
      * @since 14
      */
@@ -170,7 +174,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String vendor;
 
     /**
-     * --icon &lt;icon file path>
+     * <p>--icon &lt;icon file path></p>
+     * <p>Path of the icon of the application package.</p>
      *
      * @since 14
      */
@@ -178,7 +183,10 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private Path icon;
 
     /**
-     * --runtime-image &lt;file path>
+     * <p>--runtime-image &lt;file path></p>
+     * <p>Path of the predefined runtime image that will be copied into the application image.</p>
+     * <p>If <code>runtimeImage</code> is not specified, <code>jpackage</code> will run <code>jlink</code> to create
+     * the runtime image using options specified by <code>jLinkOptions</code>.</p>
      *
      * @since 14
      */
@@ -210,7 +218,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private Path resourceDir;
 
     /**
-     * --dest &lt;destination path>
+     * <p>--dest &lt;destination path></p>
+     * <p>Path where generated output file is placed.</p>
      *
      * @since 14
      */
@@ -218,7 +227,11 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private Path destination;
 
     /**
-     * --module &lt;module name>[/&lt;main class>]
+     * <p>--module &lt;module name>[/&lt;main class>]</p>
+     * <p>The main module (and optionally main class) of the application.
+     * This module must be located on the module path.
+     * When this option is specified, the main module will be linked in the Java runtime image. Either
+     * <code>module</code> or <code>mainJar</code> option can be specified but not both.</p>
      *
      * @since 14
      */
@@ -226,7 +239,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String module;
 
     /**
-     * --main-class &lt;class name>
+     * <p>--main-class &lt;class name></p>
+     * <p>Qualified name of the application main class to execute.</p>
      *
      * @since 14
      */
@@ -234,7 +248,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String mainClass;
 
     /**
-     * --main-jar &lt;main jar file>
+     * <p>--main-jar &lt;main jar file></p>
+     * <p>The main JAR of the application; containing the main class (specified as a path relative to the input path).</p>
      *
      * @since 14
      */
@@ -250,7 +265,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private Path temp;
 
     /**
-     * --copyright &lt;copyright string>
+     * <p>--copyright &lt;copyright string></p>
+     * <p>Copyright for the application.</p>
      *
      * @since 14
      */
@@ -258,7 +274,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String copyright;
 
     /**
-     * --description &lt;description string>
+     * <p>--description &lt;description string></p>
+     * <p>Description of the application.</p>
      *
      * @since 14
      */
@@ -435,7 +452,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     // Windows specific parameters
 
     /**
-     * --win-menu
+     * <p>--win-menu</p>
+     * <p>Request to add a Start Menu shortcut for this application.</p>
      *
      * @since 14
      */
@@ -443,7 +461,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean winMenu;
 
     /**
-     * --win-dir-chooser
+     * <p>--win-dir-chooser</p>
+     * <p>Adds a dialog to enable the user to choose a directory in which the product is installed.</p>
      *
      * @since 14
      */
@@ -451,7 +470,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean winDirChooser;
 
     /**
-     * --win-help-url &lt;url>
+     * <p>--win-help-url &lt;url></p>
+     * <p>URL where user can obtain further information or technical support.</p>
      *
      * @since 17
      */
@@ -459,7 +479,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String winHelpUrl;
 
     /**
-     * --win-upgrade-uuid &lt;id string>
+     * <p>--win-upgrade-uuid &lt;id string></p>
+     * <p>UUID associated with upgrades for this package.</p>
      *
      * @since 14
      */
@@ -467,7 +488,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String winUpgradeUuid;
 
     /**
-     * --win-menu-group &lt;menu group name>
+     * <p>--win-menu-group &lt;menu group name></p>
+     * <p>Start Menu group this application is placed in.</p>
      *
      * @since 14
      */
@@ -475,7 +497,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String winMenuGroup;
 
     /**
-     * --win-shortcut
+     * <p>--win-shortcut</p>
+     * <p>Request to create a desktop shortcut for this application.</p>
      *
      * @since 14
      */
@@ -483,7 +506,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean winShortcut;
 
     /**
-     * --win-shortcut-prompt
+     * <p>--win-shortcut-prompt</p>
+     * <p>Adds a dialog to enable the user to choose if shortcuts will be created by installer.</p>
      *
      * @since 17
      */
@@ -491,7 +515,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean winShortcutPrompt;
 
     /**
-     * --win-update-url &lt;url>
+     * <p>--win-update-url &lt;url></p>
+     * <p>URL of available application update information.</p>
      *
      * @since 17
      */
@@ -499,7 +524,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String winUpdateUrl;
 
     /**
-     * --win-per-user-install
+     * <p>--win-per-user-install</p>
+     * <p>Request to perform an installation on a per-user basis.</p>
      *
      * @since 14
      */
@@ -507,7 +533,9 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean winPerUserInstall;
 
     /**
-     * --win-console
+     * <p>--win-console</p>
+     * <p>Creates a console launcher for the application, should be specified for application which requires console
+     * interactions.</p>
      *
      * @since 14
      */
@@ -517,7 +545,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     // OS X specific parameters
 
     /**
-     * --mac-package-identifier &lt;ID string>
+     * <p>--mac-package-identifier &lt;ID string></p>
+     * <p>An identifier that uniquely identifies the application for macOS.</p>
      *
      * @since 14
      */
@@ -525,7 +554,11 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String macPackageIdentifier;
 
     /**
-     * --mac-package-name &lt;name string>
+     * <p>--mac-package-name &lt;name string></p>
+     * <p>Name of the application as it appears in the Menu Bar.</p>
+     * <p>This can be different from the application name.</p>
+     * <p>This name must be less than 16 characters long and be suitable for displaying in the menu bar and the
+     * application Info window. Defaults to the application name.</p>
      *
      * @since 14
      */
@@ -533,7 +566,9 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String macPackageName;
 
     /**
-     * --mac-package-signing-prefix &lt;prefix string>
+     * <p>--mac-package-signing-prefix &lt;prefix string></p>
+     * <p>When signing the application package, this value is prefixed to all components that need to be signed that
+     * don't have an existing package identifier.</p>
      *
      * @since 17
      */
@@ -541,7 +576,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String macPackageSigningPrefix;
 
     /**
-     * --mac-sign
+     * <p>--mac-sign</p>
+     * <p>Request that the package or the predefined application image be signed.</p>
      *
      * @since 14
      */
@@ -549,7 +585,9 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean macSign;
 
     /**
-     * --mac-signing-keychain &lt;file path>
+     * <p>--mac-signing-keychain &lt;keychain-name></p>
+     * <p>Name of the keychain to search for the signing identity.</p>
+     * <p>If not specified, the standard keychains are used.</p>
      *
      * @since 14
      */
@@ -557,7 +595,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String macSigningKeychain;
 
     /**
-     * --mac-signing-key-user-name &lt;team name>
+     * <p>--mac-signing-key-user-name &lt;team name></p>
+     * <p>Team or user name portion in Apple signing identities.</p>
      *
      * @since 14
      */
@@ -565,7 +604,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String macSigningKeyUserName;
 
     /**
-     * --mac-app-store
+     * <p>--mac-app-store</p>
+     * <p>Indicates that the jpackage output is intended for the Mac App Store.</p>
      *
      * @since 17
      */
@@ -573,7 +613,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private boolean macAppStore;
 
     /**
-     * --mac-entitlements &lt;file path>
+     * <p>--mac-entitlements &lt;file path></p>
+     * <p>Path to file containing entitlements to use when signing executables and libraries in the bundle.</p>
      *
      * @since 17
      */
@@ -581,7 +622,9 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private Path macEntitlements;
 
     /**
-     * --mac-app-category &lt;category string>
+     * <p>--mac-app-category &lt;category string></p>
+     * <p>String used to construct LSApplicationCategoryType in application plist.</p>
+     * <p>The default value is &quot;utilities&quot;.</p>
      *
      * @since 17
      */
@@ -608,7 +651,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     // Linux specific parameters
 
     /**
-     * --linux-package-name &lt;package name>
+     * <p>--linux-package-name &lt;package name></p>
+     * <p>Name for Linux package.</p>
      *
      * @since 14
      */
@@ -616,7 +660,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxPackageName;
 
     /**
-     * --linux-deb-maintainer &lt;email address>
+     * <p>--linux-deb-maintainer &lt;email address></p>
+     * <p>Maintainer for .deb bundle.</p>
      *
      * @since 14
      */
@@ -624,7 +669,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxDebMaintainer;
 
     /**
-     * --linux-menu-group &lt;menu-group-name>
+     * <p>--linux-menu-group &lt;menu-group-name></p>
+     * <p>Menu group this application is placed in.</p>
      *
      * @since 14
      */
@@ -632,15 +678,17 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxMenuGroup;
 
     /**
-     * --linux-package-deps
+     * <p>--linux-package-deps &lt;package-dep-string></p>
+     * <p>Required packages or capabilities for the application.</p>
      *
      * @since 14
      */
     @Parameter
-    private boolean linuxPackageDeps;
+    private String linuxPackageDeps;
 
     /**
-     * --linux-rpm-license-type &lt;type string>
+     * <p>--linux-rpm-license-type &lt;type string></p>
+     * <p>Type of the license ("License: value" of the RPM .spec)</p>
      *
      * @since 14
      */
@@ -648,7 +696,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxRpmLicenseType;
 
     /**
-     * --linux-app-release &lt;release value>
+     * <p>--linux-app-release &lt;release value></p>
+     * <p>Release value of the RPM &lt;name>.spec file or Debian revision value of the DEB control file.</p>
      *
      * @since 14
      */
@@ -656,7 +705,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxAppRelease;
 
     /**
-     * --linux-app-category &lt;category value>
+     * <p>--linux-app-category &lt;category value></p>
+     * <p>Group value of the RPM &lt;name>.spec file or Section value of DEB control file.</p>
      *
      * @since 14
      */
@@ -664,7 +714,8 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     private String linuxAppCategory;
 
     /**
-     * --linux-shortcut
+     * <p>--linux-shortcut</p>
+     * <p>Creates a shortcut for the application.</p>
      *
      * @since 14
      */
