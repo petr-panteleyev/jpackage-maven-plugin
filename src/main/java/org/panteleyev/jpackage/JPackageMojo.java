@@ -794,9 +794,7 @@ public class JPackageMojo implements org.apache.maven.api.plugin.Mojo {
     }
 
     private Optional<String> getJPackageFromToolchain(Toolchain tc) {
-        if (tc == null) {
-            return Optional.empty();
-        }
+        logger.info("Toolchain in jpackage-maven-plugin: {}", tc);
 
         var executable = tc.findTool(EXECUTABLE);
         if (executable == null) {
