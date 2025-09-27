@@ -1,10 +1,14 @@
 # JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.org/jeps/392).
+Maven plugin for [jpackage](https://docs.oracle.com/en/java/javase/25/docs/specs/man/jpackage.html).
 
-[![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
-[![Licence](https://img.shields.io/badge/Java-1.8-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
-[![Maven Central](http://img.shields.io/maven-central/v/org.panteleyev/jpackage-maven-plugin)](https://search.maven.org/search?q=g:org.panteleyev%20AND%20a:jpackage-maven-plugin)
+```xml
+<plugin>
+    <groupId>org.panteleyev</groupId>
+    <artifactId>jpackage-maven-plugin</artifactId>
+    <version>1.7.1</version>
+</plugin>
+```
 
 [Plugin Documentation](https://petr-panteleyev.github.io/jpackage-maven-plugin/)
 

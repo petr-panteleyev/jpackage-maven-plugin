@@ -1,6 +1,7 @@
 # Using JLink Output
 
-This example shows how to use [jlink-maven-plugin](https://github.com/petr-panteleyev/jlink-maven-plugin) output.
+This example shows how to use [jlink-maven-plugin](https://github.com/petr-panteleyev/jlink-maven-plugin) output as
+runtime image for ```jpackage```.
 
 ```xml
 <build>
@@ -38,4 +39,8 @@ This example shows how to use [jlink-maven-plugin](https://github.com/petr-pante
         </plugin>
     </plugins>
 </build>
+```
+
+```shell
+mvn clean verify jlink:jlink jpackage:jpackage
 ```

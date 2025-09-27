@@ -91,14 +91,13 @@ import static org.panteleyev.jpackage.util.StringUtil.isNotEmpty;
 
 /**
  * <p>Generates application package.</p>
+ *
  * <p>Each plugin parameter defines <code>jpackage</code> option.
  * For detailed information about these options please refer to
- * <a href="https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
+ * <a href="https://docs.oracle.com/en/java/javase/25/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
  */
-@Mojo(name = JPackageMojo.GOAL, defaultPhase = LifecyclePhase.NONE)
+@Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
 public class JPackageMojo extends AbstractMojo {
-    public static final String GOAL = "jpackage";
-
     private static final String TOOLCHAIN = "jdk";
     public static final String EXECUTABLE = "jpackage";
 
@@ -120,7 +119,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean skip;
 
     /**
-     * --verbose
+     * <p>--verbose</p>
+     * <p>Enables verbose output.</p>
      *
      * @since 14
      */
@@ -128,9 +128,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean verbose;
 
     /**
-     * <p>--type &lt;type></p>
-     *
-     * <p>Possible values:</p>
+     * <p>--type <i>type</i></p>
+     * <p>The type of package to create. Possible values:</p>
      * <table>
      *     <tr>
      *         <th>Plugin</th><th>JPackage</th>
@@ -149,15 +148,17 @@ public class JPackageMojo extends AbstractMojo {
     private ImageType type;
 
     /**
-     * --name &lt;name>
+     * <p>--name <i>name</i></p>
+     * <p>Name of the application and/or package.</p>
      *
      * @since 14
      */
-    @Parameter(required = true)
+    @Parameter(defaultValue = "${project.name}", required = true)
     private String name;
 
     /**
-     * --app-version &lt;version>
+     * <p>--app-version <i>version</i></p>
+     * <p>Version of the application and/or package.</p>
      *
      * @since 14
      */
@@ -165,7 +166,8 @@ public class JPackageMojo extends AbstractMojo {
     private String appVersion;
 
     /**
-     * --vendor &lt;vendor string>
+     * <p>--vendor <i>vendor</i></p>
+     * <p>Vendor of the application.</p>
      *
      * @since 14
      */
@@ -173,7 +175,8 @@ public class JPackageMojo extends AbstractMojo {
     private String vendor;
 
     /**
-     * --icon &lt;icon file path>
+     * <p>--icon <i>path</i></p>
+     * <p>Path of the icon of the application package.</p>
      *
      * @since 14
      */
@@ -181,7 +184,14 @@ public class JPackageMojo extends AbstractMojo {
     private File icon;
 
     /**
-     * --runtime-image &lt;file path>
+     * <p>--runtime-image <i>path</i></p>
+     *
+     * <p><b>For runtime image:</b> Path of the predefined runtime image that will be copied into the application image.<br>
+     * If <code>runtimeImage</code> is not specified, <code>jpackage</code> will run <code>jlink</code> to create
+     * the runtime image using options specified by <code>jLinkOptions</code>.</p>
+     *
+     * <p><b>For application package:</b> Path of the predefined runtime image to install.<br>
+     * Option is required when creating a runtime installer.</p>
      *
      * @since 14
      */
@@ -189,7 +199,9 @@ public class JPackageMojo extends AbstractMojo {
     private File runtimeImage;
 
     /**
-     * --input &lt;input path>
+     * <p>--input <i>directory</i></p>
+     * <p>Path of the input directory that contains the files to be packaged. All files in the input directory will
+     * be packaged into the application image.</p>
      *
      * @since 14
      */
@@ -197,7 +209,9 @@ public class JPackageMojo extends AbstractMojo {
     private File input;
 
     /**
-     * --install-dir &lt;dir path>
+     * <p>--install-dir <i>path</i></p>
+     * <p>Absolute path of the installation directory of the application (on macOS or linux), or relative sub-path of
+     * the installation directory such as &quot;Program Files&quot; or &quot;AppData&quot; (on Windows).</p>
      *
      * @since 14
      */
@@ -205,7 +219,9 @@ public class JPackageMojo extends AbstractMojo {
     private String installDir;
 
     /**
-     * --resource-dir &lt;resource dir path>
+     * <p>--resource-dir <i>path</i></p>
+     * <p>Path to override <code>jpackage</code> resources. Icons, template files, and other resources of
+     * <code>jpackage</code> can be over-ridden by adding replacement resources to this directory.</p>
      *
      * @since 14
      */
@@ -213,7 +229,10 @@ public class JPackageMojo extends AbstractMojo {
     private File resourceDir;
 
     /**
-     * --dest &lt;destination path>
+     * <p>--dest <i>destination</i></p>
+     * <p>Path where generated output file is placed.</p>
+     *
+     * <p>See also {@link #removeDestination}</p>
      *
      * @since 14
      */
@@ -221,7 +240,11 @@ public class JPackageMojo extends AbstractMojo {
     private File destination;
 
     /**
-     * --module &lt;module name>[/&lt;main class>]
+     * <p>--module <i></I>module-name</i>[/<i>main-class</i>]</p>
+     * <p>The main module (and optionally main class) of the application.</p>
+     * <p>This module must be located on the module path.</p>
+     * <p>When this option is specified, the main module will be linked in the Java runtime image. Either
+     * <code>module</code> or <code>mainJar</code> option can be specified but not both.</p>
      *
      * @since 14
      */
@@ -229,7 +252,8 @@ public class JPackageMojo extends AbstractMojo {
     private String module;
 
     /**
-     * --main-class &lt;class name>
+     * <p>--main-class <i>class-name</i></p>
+     * <p>Qualified name of the application main class to execute.</p>
      *
      * @since 14
      */
@@ -237,7 +261,8 @@ public class JPackageMojo extends AbstractMojo {
     private String mainClass;
 
     /**
-     * --main-jar &lt;main jar file>
+     * <p>--main-jar <i>main-jar</i></p>
+     * <p>The main JAR of the application; containing the main class (specified as a path relative to the input path).</p>
      *
      * @since 14
      */
@@ -245,7 +270,10 @@ public class JPackageMojo extends AbstractMojo {
     private String mainJar;
 
     /**
-     * --temp &lt;temp dir path>
+     * <p>--temp <i>directory</i></p>
+     * <p>Path of a new or empty directory used to create temporary files.</p>
+     * <p>If specified, the temp dir will not be removed upon the task completion and must be removed manually.</p>
+     * <p>If not specified, a temporary directory will be created and removed upon the task completion.</p>
      *
      * @since 14
      */
@@ -253,7 +281,8 @@ public class JPackageMojo extends AbstractMojo {
     private File temp;
 
     /**
-     * --copyright &lt;copyright string>
+     * <p>--copyright <i>copyright</i></p>
+     * <p>Copyright for the application.</p>
      *
      * @since 14
      */
@@ -261,7 +290,8 @@ public class JPackageMojo extends AbstractMojo {
     private String copyright;
 
     /**
-     * --description &lt;description string>
+     * <p>--description <i>description</i></p>
+     * <p>Description of the application.</p>
      *
      * @since 14
      */
@@ -269,11 +299,12 @@ public class JPackageMojo extends AbstractMojo {
     private String description;
 
     /**
-     * <p>Each module path is specified by a separate &lt;modulePath> parameter.</p>
+     * <p>--module-path <i>module-path</i> [,<i>module-path</i>...]</p>
+     * <p>Each path is either a directory of modules or the path to a modular jar.</p>
      * <p>Example:
      * <pre>
      * &lt;modulePaths>
-     *     &lt;modulePath>target/jmods&lt;/modulePath>
+     *     &lt;path>${project.build.directory}/mods&lt;/path>
      * &lt;/modulePaths>
      * </pre>
      * </p>
@@ -284,7 +315,17 @@ public class JPackageMojo extends AbstractMojo {
     private List<File> modulePaths;
 
     /**
-     * --java-options &lt;JVM option>
+     * <p>--java-options <i>options</i></p>
+     * <p>Options to pass to the Java runtime.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;javaOptions>
+     *     &lt;option>-XX:NewRatio=1&lt;/option>
+     *     &lt;option>-Xms100m&lt;/option>
+     *     &lt;option>-Xmx100m&lt;/option>
+     * &lt;/javaOptions>
+     * </pre>
+     * </p>
      *
      * @since 14
      */
@@ -292,7 +333,15 @@ public class JPackageMojo extends AbstractMojo {
     private List<String> javaOptions;
 
     /**
-     * --arguments &lt;main class arguments>
+     * <p>--arguments <i>arguments</i></p>
+     * <p>Command line arguments to pass to the main class if no command line arguments are given to the launcher.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;arguments>
+     *     &lt;argument>--help&lt;/argument>
+     * &lt;/arguments>
+     * </pre>
+     * </p>
      *
      * @since 14
      */
@@ -300,7 +349,8 @@ public class JPackageMojo extends AbstractMojo {
     private List<String> arguments;
 
     /**
-     * --license-file &lt;license file path>
+     * <p>--license-file <i>path</i></p>
+     * <p>Path to the license file.</p>
      *
      * @since 14
      */
@@ -308,14 +358,14 @@ public class JPackageMojo extends AbstractMojo {
     private File licenseFile;
 
     /**
-     * <p>--file-associations &lt;file association property file></p>
-     *
+     * <p>--file-associations <i>path</i></p>
+     * <p>Path to a Properties file that contains list of key, value pairs.</p>
      * <p>Each property file is specified by a separate &lt;fileAssociation> parameter.</p>
      * <p>Example:
      * <pre>
      * &lt;fileAssociations>
-     *     &lt;fileAssociation>src/properties/java.properties&lt;/fileAssociation>
-     *     &lt;fileAssociation>src/properties/cpp.properties&lt;/fileAssociation>
+     *     &lt;association>src/properties/java.properties&lt;/association>
+     *     &lt;association>src/properties/cpp.properties&lt;/association>
      * &lt;/fileAssociations>
      * </pre>
      * </p>
@@ -326,17 +376,18 @@ public class JPackageMojo extends AbstractMojo {
     private List<File> fileAssociations;
 
     /**
-     * <p>--add-launcher &lt;name>=&lt;file></p>
-     *
-     * <p>Application launchers specified by one</p>
+     * <p>--add-launcher <i>name=path</i></p>
+     * <p>Name of launcher, and a path to a Properties file that contains a list of key, value pairs.</p>
+     * <p>Example:
      * <pre>
-     * &lt;launcher>
-     *     &lt;name>name-of-the-launcher&lt;/name>
-     *     &lt;file>/path/to/launcher.properties&lt;/file>
-     * &lt;/launcher>
+     * &lt;launchers>
+     *     &lt;launcher>
+     *         &lt;name>name-of-the-launcher&lt;/name>
+     *         &lt;file>/path/to/launcher.properties&lt;/file>
+     *     &lt;/launcher>
+     * &lt;/launchers>
      * </pre>
-     *
-     * <p>element for each launcher.</p>
+     * </p>
      *
      * @since 14
      */
@@ -344,7 +395,18 @@ public class JPackageMojo extends AbstractMojo {
     private List<Launcher> launchers;
 
     /**
-     * <p>--add-modules &lt;module>[,&lt;module>]</p>
+     * <p>--add-modules <i>module</i>[,<i>module</i>]</p>
+     * <p>This module list, along with the main module (if specified) will be passed to <code>jlink</code> as the
+     * --add-module argument. If not specified, either just the main module (if <code>module</code> is specified), or
+     * the default set of modules (if <code>mainJar</code> is specified) are used.</p>
+     * <p>Example:
+     * <pre>
+     * &lt;addModules>
+     *     &lt;module>module1&lt;/module>
+     *     &lt;module>module2&lt;/module>
+     * &lt;/addModules>
+     * </pre>
+     * </p>
      *
      * @since 14
      */
@@ -352,7 +414,9 @@ public class JPackageMojo extends AbstractMojo {
     private List<String> addModules;
 
     /**
-     * <p>--app-image &lt;path to application image></p>
+     * <p>--app-image <i>directory</i></p>
+     * <p>Location of the predefined application image that is used to build an installable package (on all platforms)
+     * or to be signed (on macOS).</p>
      *
      * @since 14
      */
@@ -361,7 +425,6 @@ public class JPackageMojo extends AbstractMojo {
 
     /**
      * <p>Additional jpackage options not covered by dedicated plugin parameters.</p>
-     *
      * <p>Example:
      * <pre>
      * &lt;additionalOptions>
@@ -375,13 +438,14 @@ public class JPackageMojo extends AbstractMojo {
     private List<String> additionalOptions;
 
     /**
-     * <p>jlink options.</p>
-     *
+     * <p>--jlink-options <i>options</i></p>
+     * <p>A list of options to pass to jlink</p>
+     * <p>If not specified, defaults to &quot;--strip-native-commands --strip-debug --no-man-pages --no-header-files&quot;.</p>
      * <p>Example:
      * <pre>
      * &lt;jLinkOptions>
-     *     &lt;jLinkOption>--strip-native-commands&lt;/jLinkOption>
-     *     &lt;jLinkOption>--strip-debug&lt;/jLinkOption>
+     *     &lt;option>--strip-native-commands&lt;/option>
+     *     &lt;option>--strip-debug&lt;/option>
      * &lt;/jLinkOptions>
      * </pre>
      * </p>
@@ -392,16 +456,8 @@ public class JPackageMojo extends AbstractMojo {
     private List<String> jLinkOptions;
 
     /**
-     * <p>--bind-services</p>
-     * <p>This option is supported by jpackage versions 14 and 15 only.</p>
-     *
-     * @since 14
-     */
-    @Parameter
-    private boolean bindServices;
-
-    /**
-     * --about-url &lt;url>
+     * <p>--about-url <i>url</i></p>
+     * <p>URL of the application's home page.</p>
      *
      * @since 17
      */
@@ -409,12 +465,13 @@ public class JPackageMojo extends AbstractMojo {
     private String aboutUrl;
 
     /**
-     * <p>--app-content additional-content[,additional-content...]</p>
+     * <p>--app-content <i>additional-content</i>[,<i>additional-content</i>...]</p>
+     * <p>A list of paths to files and/or directories to add to the application payload.</p>
      * <p>Example:
      * <pre>
      * &lt;appContentPaths>
-     *     &lt;appContentPath>./docs&lt;/appContentPath>
-     *     &lt;appContentPath>./images&lt;/appContentPath>
+     *     &lt;path>./docs&lt;/path>
+     *     &lt;path>./images&lt;/path>
      * &lt;/appContentPaths>
      * </pre>
      * </p>
@@ -425,7 +482,9 @@ public class JPackageMojo extends AbstractMojo {
     private List<File> appContentPaths;
 
     /**
-     * --launcher-as-service
+     * <p>--launcher-as-service</p>
+     * <p>Request to create an installer that will register the main application launcher as a background service-type
+     * application.</p>
      *
      * @since 19
      */
@@ -434,10 +493,12 @@ public class JPackageMojo extends AbstractMojo {
 
     /**
      * <p>Remove destination directory.</p>
-     * <p><code>jpackage</code> utility fails if generated binary already exists. In order to work around this behaviour
-     * there is plugin boolean option <code>removeDestination</code>. If <code>true</code> plugin will try to delete
-     * directory specified by <code>destination</code>. This might be useful to relaunch <code>jpackage</code> task
-     * without rebuilding an entire project.</p>
+     * <p>Request to remove <code>destination</code> directory before executing <code>jpackage</code>.</p>
+     *
+     * <p><code>jpackage</code> utility fails if generated binary already exists. This option allows to overcome this
+     * behaviour. If <code>true</code> plugin will try to delete directory specified by <code>destination</code>.
+     * This might be useful to relaunch <code>jpackage</code> task without rebuilding an entire project.</p>
+     *
      * <p>For safety reasons plugin will not process <code>removeDestination</code> if <code>destination</code> points
      * to a location outside of <code>${project.build.directory}</code>.</p>
      */
@@ -447,7 +508,8 @@ public class JPackageMojo extends AbstractMojo {
     // Windows specific parameters
 
     /**
-     * --win-menu
+     * <p>--win-menu</p>
+     * <p>Request to add a Start Menu shortcut for this application.</p>
      *
      * @since 14
      */
@@ -455,7 +517,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winMenu;
 
     /**
-     * --win-dir-chooser
+     * <p>--win-dir-chooser</p>
+     * <p>Adds a dialog to enable the user to choose a directory in which the product is installed.</p>
      *
      * @since 14
      */
@@ -463,7 +526,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winDirChooser;
 
     /**
-     * --win-help-url &lt;url>
+     * <p>--win-help-url <i>url</i></p>
+     * <p>URL where user can obtain further information or technical support.</p>
      *
      * @since 17
      */
@@ -471,7 +535,8 @@ public class JPackageMojo extends AbstractMojo {
     private String winHelpUrl;
 
     /**
-     * --win-upgrade-uuid &lt;id string>
+     * <p>--win-upgrade-uuid <i>id</i></p>
+     * <p>UUID associated with upgrades for this package.</p>
      *
      * @since 14
      */
@@ -479,7 +544,8 @@ public class JPackageMojo extends AbstractMojo {
     private String winUpgradeUuid;
 
     /**
-     * --win-menu-group &lt;menu group name>
+     * <p>--win-menu-group <i>menu group name</i></p>
+     * <p>Start Menu group this application is placed in.</p>
      *
      * @since 14
      */
@@ -487,7 +553,8 @@ public class JPackageMojo extends AbstractMojo {
     private String winMenuGroup;
 
     /**
-     * --win-shortcut
+     * <p>--win-shortcut</p>
+     * <p>Request to create a desktop shortcut for this application.</p>
      *
      * @since 14
      */
@@ -495,7 +562,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winShortcut;
 
     /**
-     * --win-shortcut-prompt
+     * <p>--win-shortcut-prompt</p>
+     * <p>Adds a dialog to enable the user to choose if shortcuts will be created by installer.</p>
      *
      * @since 17
      */
@@ -503,7 +571,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winShortcutPrompt;
 
     /**
-     * --win-update-url &lt;url>
+     * <p>--win-update-url <i>url</i></p>
+     * <p>URL of available application update information.</p>
      *
      * @since 17
      */
@@ -511,7 +580,8 @@ public class JPackageMojo extends AbstractMojo {
     private String winUpdateUrl;
 
     /**
-     * --win-per-user-install
+     * <p>--win-per-user-install</p>
+     * <p>Request to perform an installation on a per-user basis.</p>
      *
      * @since 14
      */
@@ -519,7 +589,9 @@ public class JPackageMojo extends AbstractMojo {
     private boolean winPerUserInstall;
 
     /**
-     * --win-console
+     * <p>--win-console</p>
+     * <p>Creates a console launcher for the application, should be specified for application which requires console
+     * interactions.</p>
      *
      * @since 14
      */
@@ -529,7 +601,10 @@ public class JPackageMojo extends AbstractMojo {
     // OS X specific parameters
 
     /**
-     * --mac-package-identifier &lt;ID string>
+     * <p>--mac-package-identifier <i>identifier</i></p>
+     * <p>An identifier that uniquely identifies the application for macOS.</p>
+     * <p>Defaults to the main class name.</p>
+     * <p>May only use alphanumeric (A-Z,a-z,0-9), hyphen (-), and period (.) characters.</p>
      *
      * @since 14
      */
@@ -537,7 +612,11 @@ public class JPackageMojo extends AbstractMojo {
     private String macPackageIdentifier;
 
     /**
-     * --mac-package-name &lt;name string>
+     * <p>--mac-package-name <i>name</i></p>
+     * <p>Name of the application as it appears in the Menu Bar.</p>
+     * <p>This can be different from the application name.</p>
+     * <p>This name must be less than 16 characters long and be suitable for displaying in the menu bar and the
+     * application Info window. Defaults to the application name.</p>
      *
      * @since 14
      */
@@ -545,16 +624,9 @@ public class JPackageMojo extends AbstractMojo {
     private String macPackageName;
 
     /**
-     * <p>--mac-bundle-signing-prefix &lt;prefix string></p>
-     * <p>This option is supported by jpackage versions 14, 15 and 16 only.</p>
-     *
-     * @since 14
-     */
-    @Parameter
-    private String macBundleSigningPrefix;
-
-    /**
-     * --mac-package-signing-prefix &lt;prefix string>
+     * <p>--mac-package-signing-prefix <i>prefix</i></p>
+     * <p>When signing the application package, this value is prefixed to all components that need to be signed that
+     * don't have an existing package identifier.</p>
      *
      * @since 17
      */
@@ -562,7 +634,8 @@ public class JPackageMojo extends AbstractMojo {
     private String macPackageSigningPrefix;
 
     /**
-     * --mac-sign
+     * <p>--mac-sign</p>
+     * <p>Request that the package or the predefined application image be signed.</p>
      *
      * @since 14
      */
@@ -570,7 +643,9 @@ public class JPackageMojo extends AbstractMojo {
     private boolean macSign;
 
     /**
-     * --mac-signing-keychain &lt;file path>
+     * <p>--mac-signing-keychain <i>keychain-name</i></p>
+     * <p>Name of the keychain to search for the signing identity.</p>
+     * <p>If not specified, the standard keychains are used.</p>
      *
      * @since 14
      */
@@ -578,7 +653,8 @@ public class JPackageMojo extends AbstractMojo {
     private File macSigningKeychain;
 
     /**
-     * --mac-signing-key-user-name &lt;team name>
+     * <p>--mac-signing-key-user-name <i>name</i></p>
+     * <p>Team or user name portion in Apple signing identities.</p>
      *
      * @since 14
      */
@@ -586,7 +662,8 @@ public class JPackageMojo extends AbstractMojo {
     private String macSigningKeyUserName;
 
     /**
-     * --mac-app-store
+     * <p>--mac-app-store</p>
+     * <p>Indicates that the jpackage output is intended for the Mac App Store.</p>
      *
      * @since 17
      */
@@ -594,7 +671,8 @@ public class JPackageMojo extends AbstractMojo {
     private boolean macAppStore;
 
     /**
-     * --mac-entitlements &lt;file path>
+     * <p>--mac-entitlements <i>path</i></p>
+     * <p>Path to file containing entitlements to use when signing executables and libraries in the bundle.</p>
      *
      * @since 17
      */
@@ -602,7 +680,9 @@ public class JPackageMojo extends AbstractMojo {
     private File macEntitlements;
 
     /**
-     * --mac-app-category &lt;category string>
+     * <p>--mac-app-category <i>category</i></p>
+     * <p>String used to construct LSApplicationCategoryType in application plist.</p>
+     * <p>The default value is &quot;utilities&quot;.</p>
      *
      * @since 17
      */
@@ -610,12 +690,13 @@ public class JPackageMojo extends AbstractMojo {
     private String macAppCategory;
 
     /**
-     * <p>--mac-dmg-content additional-content[,additional-content...]</p>
+     * <p>--mac-dmg-content <i>additional-content</i>[,<i>additional-content</i>...]</p>
+     * <p>Include all the referenced content in the dmg.</p>
      * <p>Example:
      * <pre>
      * &lt;macDmgContentPaths>
-     *     &lt;macDmgContentPath>./docs&lt;/macDmgContentPath>
-     *     &lt;macDmgContentPath>./images&lt;/macDmgContentPath>
+     *     &lt;path>./docs&lt;/path>
+     *     &lt;path>./images&lt;/path>
      * &lt;/macDmgContentPaths>
      * </pre>
      * </p>
@@ -629,7 +710,8 @@ public class JPackageMojo extends AbstractMojo {
     // Linux specific parameters
 
     /**
-     * --linux-package-name &lt;package name>
+     * <p>--linux-package-name <i>name</i></p>
+     * <p>Name for Linux package.</p>
      *
      * @since 14
      */
@@ -637,7 +719,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxPackageName;
 
     /**
-     * --linux-deb-maintainer &lt;email address>
+     * <p>--linux-deb-maintainer <i>email-address</i></p>
+     * <p>Maintainer for .deb bundle.</p>
      *
      * @since 14
      */
@@ -645,7 +728,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxDebMaintainer;
 
     /**
-     * --linux-menu-group &lt;menu-group-name>
+     * <p>--linux-menu-group <i>menu-group-name</i></p>
+     * <p>Menu group this application is placed in.</p>
      *
      * @since 14
      */
@@ -653,7 +737,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxMenuGroup;
 
     /**
-     * --linux-package-deps &lt;package-dep-string>
+     * <p>--linux-package-deps <i>package-dep-string</i></p>
+     * <p>Required packages or capabilities for the application.</p>
      *
      * @since 14
      */
@@ -661,7 +746,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxPackageDeps;
 
     /**
-     * --linux-rpm-license-type &lt;type string>
+     * <p>--linux-rpm-license-type <i>type</i></p>
+     * <p>Type of the license ("License: value" of the RPM .spec)</p>
      *
      * @since 14
      */
@@ -669,7 +755,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxRpmLicenseType;
 
     /**
-     * --linux-app-release &lt;release value>
+     * <p>--linux-app-release <i>release</i></p>
+     * <p>Release value of the RPM &lt;name>.spec file or Debian revision value of the DEB control file.</p>
      *
      * @since 14
      */
@@ -677,7 +764,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxAppRelease;
 
     /**
-     * --linux-app-category &lt;category value>
+     * <p>--linux-app-category <i>category-value</i></p>
+     * <p>Group value of the RPM &lt;name>.spec file or Section value of DEB control file.</p>
      *
      * @since 14
      */
@@ -685,7 +773,8 @@ public class JPackageMojo extends AbstractMojo {
     private String linuxAppCategory;
 
     /**
-     * --linux-shortcut
+     * <p>--linux-shortcut</p>
+     * <p>Creates a shortcut for the application.</p>
      *
      * @since 14
      */
@@ -941,10 +1030,8 @@ public class JPackageMojo extends AbstractMojo {
         addParameter(commandline, parameter, value);
     }
 
-    private void addMandatoryParameter(
-            Commandline commandline,
-            @SuppressWarnings("SameParameterValue") CommandLineParameter parameter,
-            File value,
+    @SuppressWarnings("SameParameterValue")
+    private void addMandatoryParameter(Commandline commandline, CommandLineParameter parameter, File value,
             boolean checkExistence) throws MojoFailureException
     {
         if (value == null) {
@@ -964,11 +1051,7 @@ public class JPackageMojo extends AbstractMojo {
         commandline.createArg().setValue(value);
     }
 
-    private void addParameter(
-            Commandline commandline,
-            CommandLineParameter parameter,
-            String value)
-    {
+    private void addParameter(Commandline commandline, CommandLineParameter parameter, String value) {
         if (value == null || value.isEmpty()) {
             return;
         }
@@ -978,34 +1061,14 @@ public class JPackageMojo extends AbstractMojo {
         commandline.createArg().setValue(value);
     }
 
-    private void addParameter(
-            Commandline commandline,
-            CommandLineParameter parameter,
-            File value,
+    private void addParameter(Commandline commandline, CommandLineParameter parameter, File value,
             boolean checkExistence) throws MojoFailureException
-    {
-        addParameter(
-                commandline,
-                parameter,
-                value,
-                checkExistence,
-                true
-        );
-    }
-
-    private void addParameter(
-            Commandline commandline,
-            CommandLineParameter parameter,
-            File value,
-            boolean checkExistence,
-            boolean makeAbsolute
-    ) throws MojoFailureException
     {
         if (value == null) {
             return;
         }
 
-        String path = makeAbsolute ? value.getAbsolutePath() : value.getPath();
+        String path = value.getAbsolutePath();
 
         if (checkExistence && !value.exists()) {
             throw new MojoFailureException("File or directory " + path + " does not exist");
@@ -1032,11 +1095,8 @@ public class JPackageMojo extends AbstractMojo {
         commandline.createArg().setValue(parameter.getName());
     }
 
-    private void addParameter(
-            Commandline commandline,
-            CommandLineParameter parameter,
-            EnumParameter value) throws MojoFailureException
-    {
+    @SuppressWarnings("SameParameterValue")
+    private void addParameter(Commandline commandline, CommandLineParameter parameter, EnumParameter value) {
         if (value == null) {
             return;
         }

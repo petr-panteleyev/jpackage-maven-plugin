@@ -1,6 +1,6 @@
 ## JPackage Maven Plugin
 
-Maven plugin for [jpackage](https://openjdk.org/jeps/392).
+Maven plugin for [jpackage](https://docs.oracle.com/en/java/javase/25/docs/specs/man/jpackage.html).
 
 ### Goals Overview
 
@@ -8,7 +8,7 @@ Maven plugin for [jpackage](https://openjdk.org/jeps/392).
 
 ### Usage
 
-  General instructions on how to use the JPackage Maven Plugin can be found on the [usage page](./usage.html). Some more
+  General instructions on how to use the JPackage Maven Plugin can be found on the [usage page](./usage.md). Some more
   specific use cases are described in the examples given below.
 
   If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our
@@ -22,9 +22,11 @@ Maven plugin for [jpackage](https://openjdk.org/jeps/392).
 To provide you with better understanding of some usages of the JPackage Maven Plugin,
 you can take a look into the following examples:
 
-* [Image with full JRE](./examples/full-jre.html)
-* [Configuration via executions](./examples/executions.html)
-* [Configuration via profiles](./examples/profiles.html)
+* [Non-Modular Application](./examples/full-jre.md)
+* [Configuration with Executions](./examples/executions.md)
+* [Configuration with Profiles](./examples/profiles.md)
+* [Using JLink Output](./examples/jlink.md)
+* [Application Image Dependencies](./examples/dependencies.md)
 
 ## Packaging Tool User's Guide
 

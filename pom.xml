@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -50,11 +50,11 @@
         <jUnitVersion>5.12.1</jUnitVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJavadocPluginVersion>3.11.3</mavenJavadocPluginVersion>
         <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
         <mavenPluginPluginVersion>3.13.0</mavenPluginPluginVersion>
-        <mavenSitePluginVersion>3.12.1</mavenSitePluginVersion>
+        <mavenSitePluginVersion>3.21.0</mavenSitePluginVersion>
         <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
         <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>3.2.4</mavenGpgPluginVersion>
@@ -133,6 +133,7 @@
                             <failOnError>false</failOnError>
                             <doclint>none</doclint>
                             <source>${maven.compiler.source}</source>
+                            <disableNoFonts>true</disableNoFonts>
                         </configuration>
                     </execution>
                 </executions>

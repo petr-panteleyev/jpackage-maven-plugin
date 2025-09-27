@@ -1,7 +1,8 @@
-## Configuration with profiles
+# Configuration with Profiles
+
+This example shows how to use profiles to configure OS-specific parameters for ```jpackage```.
 
 ```xml
-
 <project>
     <profiles>
         <profile>
@@ -16,7 +17,6 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
                             <icon>icons/icons.ico</icon>
@@ -38,7 +38,6 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
                             <icon>icons/icons.icns</icon>
@@ -48,10 +47,10 @@
             </build>
         </profile>
         <profile>
-            <id>mac</id>
+            <id>linux</id>
             <activation>
                 <os>
-                    <family>unix</family>
+                    <family>linux</family>
                 </os>
             </activation>
             <build>
@@ -59,7 +58,6 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.4</version>
 
                         <configuration>
                             <type>APP_IMAGE</type>
@@ -76,7 +74,6 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
-                <version>1.6.4</version>
 
                 <!-- Common part of configuration -->
                 <configuration>
@@ -92,6 +89,9 @@
                         <option>--enable-preview</option>
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
+                    <removeDestination>true</removeDestination>
+                    <!-- Windows -->
+                    <winMenu>true</winMenu>
                 </configuration>
             </plugin>
         </plugins>
