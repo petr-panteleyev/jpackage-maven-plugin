@@ -20,8 +20,8 @@ import org.apache.maven.toolchain.ToolchainManager;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.panteleyev.jpackage.CommandLineParameter.ABOUT_URL;
 import static org.panteleyev.jpackage.CommandLineParameter.ADD_LAUNCHER;
@@ -940,9 +940,11 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (javaOptions != null) {
-            for (String option : javaOptions) {
-                addParameter(commandline, JAVA_OPTIONS, escape(option));
-            }
+            javaOptions.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::splitComplexArgumentString)
+                    .flatMap(Collection::stream)
+                    .forEach(option -> addParameter(commandline, JAVA_OPTIONS, escape(option)));
         }
 
         if (arguments != null) {
@@ -1102,5 +1104,34 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         addParameter(commandline, parameter, value.getValue());
+    }
+
+    private List<String> splitComplexArgumentString(String argument) {
+        char[] strArr = argument.trim().toCharArray();
+        List<String> splitArgs = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        char expectedSeparator = ' ';
+        for (int i = 0; i < strArr.length; i++) {
+            char item = strArr[i];
+            if (item == expectedSeparator
+                    || (expectedSeparator == ' ' && Pattern.matches("\\s", String.valueOf(item))) ) {
+                if (expectedSeparator == '"' || expectedSeparator == '\'') {
+                    sb.append(item);
+                    expectedSeparator = ' ';
+                } else if (sb.length() !=0) {
+                    splitArgs.add(sb.toString());
+                    sb.delete(0, sb.length());
+                }
+            } else {
+                if (expectedSeparator == ' ' && (item == '"' || item == '\'')) {
+                    expectedSeparator = item;
+                }
+                sb.append(item);
+            }
+            if (i == strArr.length - 1 && sb.length() > 0) {
+                splitArgs.add(sb.toString());
+            }
+        }
+        return splitArgs;
     }
 }
