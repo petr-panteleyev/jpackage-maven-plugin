@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2025 Petr Panteleyev
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.jpackage;
 
 import org.apache.maven.execution.MavenSession;
@@ -21,7 +19,9 @@ import org.apache.maven.toolchain.ToolchainManager;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.panteleyev.jpackage.CommandLineParameter.ABOUT_URL;
 import static org.panteleyev.jpackage.CommandLineParameter.ADD_LAUNCHER;
@@ -94,7 +94,8 @@ import static org.panteleyev.jpackage.util.StringUtil.isNotEmpty;
  *
  * <p>Each plugin parameter defines <code>jpackage</code> option.
  * For detailed information about these options please refer to
- * <a href="https://docs.oracle.com/en/java/javase/25/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's Guide</a></p>
+ * <a href="https://docs.oracle.com/en/java/javase/25/jpackage/packaging-tool-user-guide.pdf">Packaging Tool User's
+ * Guide</a></p>
  */
 @Mojo(name = "jpackage", defaultPhase = LifecyclePhase.NONE)
 public class JPackageMojo extends AbstractMojo {
@@ -186,9 +187,9 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * <p>--runtime-image <i>path</i></p>
      *
-     * <p><b>For runtime image:</b> Path of the predefined runtime image that will be copied into the application image.<br>
-     * If <code>runtimeImage</code> is not specified, <code>jpackage</code> will run <code>jlink</code> to create
-     * the runtime image using options specified by <code>jLinkOptions</code>.</p>
+     * <p><b>For runtime image:</b> Path of the predefined runtime image that will be copied into the application
+     * image.<br> If <code>runtimeImage</code> is not specified, <code>jpackage</code> will run <code>jlink</code> to
+     * create the runtime image using options specified by <code>jLinkOptions</code>.</p>
      *
      * <p><b>For application package:</b> Path of the predefined runtime image to install.<br>
      * Option is required when creating a runtime installer.</p>
@@ -262,7 +263,8 @@ public class JPackageMojo extends AbstractMojo {
 
     /**
      * <p>--main-jar <i>main-jar</i></p>
-     * <p>The main JAR of the application; containing the main class (specified as a path relative to the input path).</p>
+     * <p>The main JAR of the application; containing the main class (specified as a path relative to the input
+     * path).</p>
      *
      * @since 14
      */
@@ -440,7 +442,8 @@ public class JPackageMojo extends AbstractMojo {
     /**
      * <p>--jlink-options <i>options</i></p>
      * <p>A list of options to pass to jlink</p>
-     * <p>If not specified, defaults to &quot;--strip-native-commands --strip-debug --no-man-pages --no-header-files&quot;.</p>
+     * <p>If not specified, defaults to &quot;--strip-native-commands --strip-debug --no-man-pages
+     * --no-header-files&quot;.</p>
      * <p>Example:
      * <pre>
      * &lt;jLinkOptions>
@@ -496,8 +499,8 @@ public class JPackageMojo extends AbstractMojo {
      * <p>Request to remove <code>destination</code> directory before executing <code>jpackage</code>.</p>
      *
      * <p><code>jpackage</code> utility fails if generated binary already exists. This option allows to overcome this
-     * behaviour. If <code>true</code> plugin will try to delete directory specified by <code>destination</code>.
-     * This might be useful to relaunch <code>jpackage</code> task without rebuilding an entire project.</p>
+     * behaviour. If <code>true</code> plugin will try to delete directory specified by <code>destination</code>. This
+     * might be useful to relaunch <code>jpackage</code> task without rebuilding an entire project.</p>
      *
      * <p>For safety reasons plugin will not process <code>removeDestination</code> if <code>destination</code> points
      * to a location outside of <code>${project.build.directory}</code>.</p>
@@ -932,11 +935,17 @@ public class JPackageMojo extends AbstractMojo {
         }
 
         if (addModules != null && !addModules.isEmpty()) {
-            addParameter(commandline, ADD_MODULES, String.join(",", addModules));
+            addParameter(commandline, ADD_MODULES,
+                    addModules.stream()
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.joining(",")));
         }
 
         if (jLinkOptions != null && !jLinkOptions.isEmpty()) {
-            addParameter(commandline, JLINK_OPTIONS, String.join(" ", jLinkOptions));
+            addParameter(commandline, JLINK_OPTIONS,
+                    jLinkOptions.stream()
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.joining(",")));
         }
 
         if (javaOptions != null) {
@@ -965,6 +974,7 @@ public class JPackageMojo extends AbstractMojo {
 
         if (launchers != null) {
             for (Launcher launcher : launchers) {
+                if (launcher == null) continue;
                 launcher.validate();
                 addParameter(commandline, ADD_LAUNCHER,
                         launcher.getName() + "=" + launcher.getFile().getAbsolutePath());

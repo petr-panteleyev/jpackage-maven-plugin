@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright © 2020-2025 Petr Panteleyev
-  SPDX-License-Identifier: BSD-2-Clause
-  -->
+<!-- Copyright © 2020-2026 Petr Panteleyev -->
+<!-- SPDX-License-Identifier: BSD-2-Clause -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -10,7 +8,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -44,21 +42,21 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <!-- Dependencies -->
-        <mavenCoreVersion>3.9.11</mavenCoreVersion>
-        <mavenPluginApiVersion>3.9.11</mavenPluginApiVersion>
+        <mavenCoreVersion>3.9.12</mavenCoreVersion>
+        <mavenPluginApiVersion>3.9.12</mavenPluginApiVersion>
         <mavenSharedUtilsVersion>3.4.2</mavenSharedUtilsVersion>
         <jUnitVersion>5.12.1</jUnitVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
-        <mavenJavadocPluginVersion>3.11.3</mavenJavadocPluginVersion>
-        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
-        <mavenPluginPluginVersion>3.13.0</mavenPluginPluginVersion>
+        <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
+        <mavenJavadocPluginVersion>3.12.0</mavenJavadocPluginVersion>
+        <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
+        <mavenPluginPluginVersion>3.15.2</mavenPluginPluginVersion>
         <mavenSitePluginVersion>3.21.0</mavenSitePluginVersion>
         <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
-        <mavenSourcePluginVersion>3.3.1</mavenSourcePluginVersion>
-        <mavenGpgPluginVersion>3.2.4</mavenGpgPluginVersion>
-        <nexusStagingMavenPlugin>0.7.0</nexusStagingMavenPlugin>
+        <mavenSourcePluginVersion>3.4.0</mavenSourcePluginVersion>
+        <mavenGpgPluginVersion>3.2.8</mavenGpgPluginVersion>
+        <nexusStagingMavenPlugin>0.9.0</nexusStagingMavenPlugin>
     </properties>
 
     <dependencies>
@@ -214,6 +212,11 @@
                 <version>${mavenPluginPluginVersion}</version>
                 <configuration>
                     <requirementsHistories>
+                        <requirementsHistory>
+                            <version>1.7.2</version>
+                            <maven>3.9.12</maven>
+                            <jdk>8</jdk>
+                        </requirementsHistory>
                         <requirementsHistory>
                             <version>1.7.0</version>
                             <maven>3.9.11</maven>

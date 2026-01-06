@@ -1,6 +1,5 @@
-// Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
+// Copyright © 2020-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
-
 package org.panteleyev.jpackage.util;
 
 import java.util.regex.Matcher;
@@ -16,6 +15,8 @@ public final class StringUtil {
     private static final String SPACE_WRAPPER = isWindows() ? "\\\"" : "\"";
 
     public static String escape(String arg) {
+        if (arg == null || arg.isEmpty()) return arg;
+
         arg = arg.replaceAll("\"", REPLACER);
         if (arg.contains(" ")) {
             arg = SPACE_WRAPPER + arg + SPACE_WRAPPER;
