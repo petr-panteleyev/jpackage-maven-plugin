@@ -945,7 +945,7 @@ public class JPackageMojo extends AbstractMojo {
             addParameter(commandline, JLINK_OPTIONS,
                     jLinkOptions.stream()
                             .filter(Objects::nonNull)
-                            .collect(Collectors.joining(",")));
+                            .collect(Collectors.joining(" ")));
         }
 
         if (javaOptions != null) {

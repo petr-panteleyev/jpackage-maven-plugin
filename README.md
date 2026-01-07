@@ -6,7 +6,7 @@ Maven plugin for [jpackage](https://docs.oracle.com/en/java/javase/25/docs/specs
 <plugin>
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
 </plugin>
 ```
 
