@@ -8,7 +8,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.7.3</version>
+    <version>1.7.4</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -56,7 +56,7 @@
         <mavenProjectInfoReportsPluginVersion>3.5.0</mavenProjectInfoReportsPluginVersion>
         <mavenSourcePluginVersion>3.4.0</mavenSourcePluginVersion>
         <mavenGpgPluginVersion>3.2.8</mavenGpgPluginVersion>
-        <nexusStagingMavenPlugin>0.9.0</nexusStagingMavenPlugin>
+        <nexusStagingMavenPlugin>0.10.0</nexusStagingMavenPlugin>
     </properties>
 
     <dependencies>
