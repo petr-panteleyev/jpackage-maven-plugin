@@ -8,7 +8,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.7.4</version>
+    <version>1.8.0</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -42,13 +42,13 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <!-- Dependencies -->
-        <mavenCoreVersion>3.9.12</mavenCoreVersion>
-        <mavenPluginApiVersion>3.9.12</mavenPluginApiVersion>
+        <mavenCoreVersion>3.9.16</mavenCoreVersion>
+        <mavenPluginApiVersion>3.9.16</mavenPluginApiVersion>
         <mavenSharedUtilsVersion>3.4.2</mavenSharedUtilsVersion>
-        <jUnitVersion>5.12.1</jUnitVersion>
+        <jUnitVersion>5.14.4</jUnitVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.2.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
         <mavenJavadocPluginVersion>3.12.0</mavenJavadocPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenPluginPluginVersion>3.15.2</mavenPluginPluginVersion>
@@ -132,6 +132,7 @@
                             <doclint>none</doclint>
                             <source>${maven.compiler.source}</source>
                             <disableNoFonts>true</disableNoFonts>
+                            <excludePackageNames>org.panteleyev.jpackage.util</excludePackageNames>
                         </configuration>
                     </execution>
                 </executions>
@@ -212,6 +213,11 @@
                 <version>${mavenPluginPluginVersion}</version>
                 <configuration>
                     <requirementsHistories>
+                        <requirementsHistory>
+                            <version>1.8.0</version>
+                            <maven>3.9.16</maven>
+                            <jdk>8</jdk>
+                        </requirementsHistory>
                         <requirementsHistory>
                             <version>1.7.2</version>
                             <maven>3.9.12</maven>
